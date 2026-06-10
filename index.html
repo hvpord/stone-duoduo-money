@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>石头多多理财小助手</title>
+  <style>
+    :root {
+      --stone-color: #5BA4E6;
+      --stone-light: #E8F4FD;
+      --duoduo-color: #7ED67E;
+      --duoduo-light: #E8F8E8;
+      --star-color: #FFD93D;
+      --super-color: #FF8C42;
+      --big-color: #FF6B9D;
+      --small-color: #C084FC;
+      --bg-color: #FFF9F0;
+      --card-bg: #FFFFFF;
+      --text-main: #4A4A68;
+      --text-light: #8A8AA3;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", sans-serif;
+      background: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    /* 页面切换 */
+    .page {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .page.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 顶部标题 */
+    .header {
+      text-align: center;
+      padding: 20px 16px 10px;
+    }
+    .header h1 {
+      font-size: 22px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .header .subtitle {
+      font-size: 13px;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    /* 孩子卡片区域 */
+    .children-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 0 16px;
+      margin-bottom: 20px;
+    }
+    .child-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 16px 12px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+    .child-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+    .child-card.stone::before { background: var(--stone-color); }
+    .child-card.duoduo::before { background: var(--duoduo-color); }
+
+    .child-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      margin: 0 auto 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      background: var(--stone-light);
+    }
+    .child-card.duoduo .child-avatar {
+      background: var(--duoduo-light);
+    }
+    .child-name {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .child-balance {
+      font-size: 13px;
+      color: var(--text-light);
+      line-height: 1.5;
+    }
+    .child-balance .amount {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    /* 奖贴展示 - 大大的图标 */
+    .currency-display {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2px;
+      margin-top: 8px;
+      min-height: 80px;
+      align-items: flex-end;
+    }
+    .currency-sticker {
+      line-height: 1;
+      display: inline-flex;
+      align-items: flex-end;
+    }
+    /* 超大贴换行容器 */
+    .super-sticker-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2px;
+      width: 100%;
+      align-items: flex-end;
+    }
+    .super-sticker-row.second-row {
+      margin-top: 2px;
+    }
+
+    /* 快捷操作 */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 0 16px;
+      margin-bottom: 20px;
+    }
+    .action-btn {
+      background: var(--card-bg);
+      border: none;
+      border-radius: 16px;
+      padding: 14px 6px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      font-size: 12px;
+      color: var(--text-main);
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .action-btn:active {
+      transform: scale(0.95);
+    }
+    .action-btn .icon {
+      font-size: 24px;
+    }
+
+    /* 探险列表（任务/心愿/挑战） */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 16px;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .filter-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 0 16px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+    }
+    .filter-tab {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      background: #E8E8F0;
+      color: var(--text-light);
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .filter-tab.active {
+      background: var(--star-color);
+      color: #5A4A00;
+    }
+
+    .quest-list {
+      padding: 0 16px;
+    }
+    .quest-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .quest-card:active {
+      transform: scale(0.98);
+    }
+    .quest-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .quest-icon.task { background: #E8F4FD; }
+    .quest-icon.wish { background: #FFF0E6; }
+    .quest-icon.challenge { background: #F3E8FF; }
+
+    .quest-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .quest-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .quest-meta {
+      font-size: 12px;
+      color: var(--text-light);
+      display: flex;
+      gap: 8px;
+    }
+    .quest-reward {
+      font-size: 13px;
+      font-weight: 700;
+      color: #E6A817;
+      flex-shrink: 0;
+    }
+    .quest-status {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .status-pending { background: #E8F4FD; color: var(--stone-color); }
+    .status-claimed { background: #FFF8DC; color: #B8960C; }
+    .status-done { background: #E8F8E8; color: #2E7D32; }
+
+    /* 任务卡片上的孩子头像 */
+    .quest-avatars {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-right: 8px;
+    }
+    .quest-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      background: #F0F0F5;
+      border: 2px solid transparent;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .quest-avatar.stone-avatar {
+      background: #E8F4FD;
+      border-color: #B3D9F7;
+    }
+    .quest-avatar.duoduo-avatar {
+      background: #E8F8E8;
+      border-color: #B3E5B3;
+    }
+    .quest-avatar.dim {
+      opacity: 0.3;
+      filter: grayscale(0.8);
+      border-color: #DDD;
+      background: #F5F5F5;
+    }
+    .quest-avatar.bright {
+      opacity: 1;
+      filter: none;
+      transform: scale(1.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .quest-avatar .reward-split {
+      position: absolute;
+      bottom: -8px;
+      right: -4px;
+      font-size: 10px;
+      background: var(--star-color);
+      border-radius: 8px;
+      padding: 0 4px;
+      font-weight: 700;
+      color: #5A4A00;
+    }
+
+    /* 底部导航 */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+      box-shadow: 0 -2px 20px rgba(0,0,0,0.08);
+      z-index: 100;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 4px 16px;
+      border: none;
+      background: none;
+      color: var(--text-light);
+      font-size: 11px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .nav-item.active {
+      color: var(--stone-color);
+    }
+    .nav-item .icon {
+      font-size: 22px;
+    }
+
+    /* 弹窗 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 200;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-sheet {
+      background: var(--card-bg);
+      border-radius: 24px 24px 0 0;
+      padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .modal-close {
+      font-size: 24px;
+      border: none;
+      background: none;
+      color: var(--text-light);
+      cursor: pointer;
+    }
+
+    /* 表单 */
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #E8E8F0;
+      border-radius: 12px;
+      font-size: 15px;
+      background: var(--card-bg);
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-select:focus {
+      border-color: var(--stone-color);
+    }
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #5BA4E6, #4A90D9);
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-primary:active {
+      transform: scale(0.98);
+      box-shadow: 0 4px 15px rgba(91, 164, 230, 0.4);
+    }
+    .currency-picker {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .currency-option {
+      background: #F5F5FA;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 10px 4px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .currency-option.selected {
+      border-color: var(--star-color);
+      background: #FFF8DC;
+    }
+    /* 全局奖贴尺寸 - 统一使用这些类 */
+    .sticker-star { font-size: 72px; }
+    .sticker-super { font-size: 48px; }
+    .sticker-big { font-size: 32px; }
+    .sticker-small { font-size: 18px; }
+
+    .currency-option .emoji { display: block; margin-bottom: 2px; transition: transform 0.15s; }
+    .currency-option .emoji.star-emoji { font-size: 72px; }
+    .currency-option .emoji.super-emoji { font-size: 48px; }
+    .currency-option .emoji.big-emoji { font-size: 32px; }
+    .currency-option .emoji.small-emoji { font-size: 18px; }
+    .currency-option:active .emoji { transform: scale(0.85); }
+
+    /* 头像选择器 */
+    .avatar-picker {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      padding: 8px 0;
+    }
+    .avatar-option {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      background: #F5F5FA;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .avatar-option.selected {
+      border-color: var(--star-color);
+      box-shadow: 0 0 20px rgba(255, 217, 61, 0.6), 0 0 40px rgba(255, 217, 61, 0.3);
+      transform: scale(1.1);
+      background: #FFF8DC;
+    }
+    .avatar-option .avatar-name {
+      position: absolute;
+      bottom: -18px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-light);
+    }
+    .avatar-option.selected .avatar-name {
+      color: var(--text-main);
+    }
+
+    /* 转账方向切换 */
+    .transfer-direction {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 12px;
+      background: #F8F8FC;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .transfer-direction:active {
+      background: #E8E8F5;
+    }
+    .transfer-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      background: #E8F4FD;
+    }
+    .transfer-avatar.duoduo-avatar { background: #E8F8E8; }
+    .transfer-arrow {
+      font-size: 28px;
+      color: var(--stone-color);
+      transition: transform 0.3s;
+    }
+    .transfer-arrow.reverse {
+      transform: scaleX(-1);
+    }
+    .currency-option .name { font-size: 11px; font-weight: 600; }
+    .currency-option .value { font-size: 10px; color: var(--text-light); }
+  </style>
+</head>
+<body>
+
+<!-- ========== 首页 ========== -->
+<div class="page active" id="page-home">
+  <div class="header">
+    <h1>🌟 石头多多理财小助手</h1>
+    <div class="subtitle">勇敢探险，智慧理财！</div>
+  </div>
+
+  <div class="children-grid">
+    <div class="child-card stone" onclick="showChildDetail('stone')">
+      <div class="child-avatar">🧒</div>
+      <div class="child-name">石头</div>
+      <div class="child-balance">
+        <div class="currency-display" id="stone-balance"></div>
+      </div>
+    </div>
+    <div class="child-card duoduo" onclick="showChildDetail('duoduo')">
+      <div class="child-avatar">👶</div>
+      <div class="child-name">多多</div>
+      <div class="child-balance">
+        <div class="currency-display" id="duoduo-balance"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quick-actions">
+    <button class="action-btn" onclick="openModal('modal-income')">
+      <span class="icon">💰</span>
+      <span>发奖励</span>
+    </button>
+    <button class="action-btn" onclick="openModal('modal-expense')">
+      <span class="icon">🛒</span>
+      <span>记支出</span>
+    </button>
+    <button class="action-btn" onclick="openModal('modal-transfer')">
+      <span class="icon">🔄</span>
+      <span>转账</span>
+    </button>
+    <button class="action-btn" onclick="openModal('modal-quest')">
+      <span class="icon">✨</span>
+      <span>新任务</span>
+    </button>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">🚀 探险列表</div>
+    <span style="font-size:13px;color:var(--text-light);">待完成 3</span>
+  </div>
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="filterQuests('all')">全部</button>
+    <button class="filter-tab" onclick="filterQuests('task')">🎯 任务</button>
+    <button class="filter-tab" onclick="filterQuests('wish')">⭐ 心愿</button>
+    <button class="filter-tab" onclick="filterQuests('challenge')">🏆 挑战</button>
+  </div>
+  <div class="quest-list" id="quest-list">
+    <!-- 动态生成 -->
+  </div>
+</div>
+
+<!-- ========== 探险页 ========== -->
+<div class="page" id="page-quests">
+  <div class="header">
+    <h1>🚀 探险广场</h1>
+    <div class="subtitle">完成任务，赚取奖励贴！</div>
+  </div>
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="filterQuests2('all')">全部</button>
+    <button class="filter-tab" onclick="filterQuests2('task')">🎯 任务</button>
+    <button class="filter-tab" onclick="filterQuests2('wish')">⭐ 心愿</button>
+    <button class="filter-tab" onclick="filterQuests2('challenge')">🏆 挑战</button>
+  </div>
+  <div class="quest-list" id="quest-list2"></div>
+</div>
+
+<!-- ========== 记账页 ========== -->
+<div class="page" id="page-ledger">
+  <div class="header">
+    <h1>📒 记账本</h1>
+    <div class="subtitle">看看钱都去哪了</div>
+  </div>
+  <div class="quest-list" id="ledger-list">
+    <div class="quest-card">
+      <div class="quest-icon task" style="font-size:18px;">💰</div>
+      <div class="quest-info">
+        <div class="quest-title">每周零花钱</div>
+        <div class="quest-meta">石头 · 2026-06-09</div>
+      </div>
+      <div class="quest-reward">+¥20</div>
+    </div>
+    <div class="quest-card">
+      <div class="quest-icon wish" style="font-size:18px;">🛒</div>
+      <div class="quest-info">
+        <div class="quest-title">买漫画书</div>
+        <div class="quest-meta">多多 · 2026-06-08</div>
+      </div>
+      <div class="quest-reward" style="color:#E74C3C;">-¥35</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 设置页 ========== -->
+<div class="page" id="page-settings">
+  <div class="header">
+    <h1>⚙️ 设置</h1>
+    <div class="subtitle">管理你的小助手</div>
+  </div>
+  <div class="quest-list">
+    <div class="quest-card" onclick="openModal('modal-sync')">
+      <div class="quest-icon task" style="font-size:18px;">☁️</div>
+      <div class="quest-info">
+        <div class="quest-title">云端同步</div>
+        <div class="quest-meta">多设备共享数据</div>
+      </div>
+      <div class="quest-status status-pending">未配置</div>
+    </div>
+    <div class="quest-card">
+      <div class="quest-icon wish" style="font-size:18px;">📤</div>
+      <div class="quest-info">
+        <div class="quest-title">导出数据</div>
+        <div class="quest-meta">备份到文件</div>
+      </div>
+    </div>
+    <div class="quest-card">
+      <div class="quest-icon challenge" style="font-size:18px;">🔄</div>
+      <div class="quest-info">
+        <div class="quest-title">重置数据</div>
+        <div class="quest-meta">清空所有记录</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 底部导航 ========== -->
+<div class="bottom-nav">
+  <button class="nav-item active" onclick="switchPage('home')">
+    <span class="icon">🏠</span>
+    <span>首页</span>
+  </button>
+  <button class="nav-item" onclick="switchPage('quests')">
+    <span class="icon">🚀</span>
+    <span>探险</span>
+  </button>
+  <button class="nav-item" onclick="switchPage('ledger')">
+    <span class="icon">📒</span>
+    <span>记账</span>
+  </button>
+  <button class="nav-item" onclick="switchPage('settings')">
+    <span class="icon">⚙️</span>
+    <span>设置</span>
+  </button>
+</div>
+
+<!-- ========== 弹窗：发奖励 ========== -->
+<div class="modal-overlay" id="modal-income">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div class="modal-title">💰 发奖励</div>
+      <button class="modal-close" onclick="closeModal('modal-income'); clearStash();">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">给谁</label>
+      <input type="hidden" id="income-child" value="stone">
+      <div class="avatar-picker">
+        <div class="avatar-option selected" id="income-avatar-stone" onclick="selectChild('income', 'stone')">
+          🧒
+          <span class="avatar-name">石头</span>
+        </div>
+        <div class="avatar-option" id="income-avatar-duoduo" onclick="selectChild('income', 'duoduo')">
+          👶
+          <span class="avatar-name">多多</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">点击奖贴添加（再点移除）</label>
+      <div class="currency-picker">
+        <div class="currency-option" onclick="toggleStash('star', '🪐', event)">
+          <span class="emoji star-emoji">🪐</span>
+          <span class="name">星球</span>
+          <span class="value">¥1000</span>
+        </div>
+        <div class="currency-option" onclick="toggleStash('super', '🎫', event)">
+          <span class="emoji super-emoji">🎫</span>
+          <span class="name">超大贴</span>
+          <span class="value">¥50</span>
+        </div>
+        <div class="currency-option" onclick="toggleStash('big', '🥇', event)">
+          <span class="emoji big-emoji">🥇</span>
+          <span class="name">大奖贴</span>
+          <span class="value">¥5</span>
+        </div>
+        <div class="currency-option" onclick="toggleStash('small', '🥈', event)">
+          <span class="emoji small-emoji">🥈</span>
+          <span class="name">小奖贴</span>
+          <span class="value">¥2.5</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">暂存区 📦</label>
+      <div id="stash-area" style="background:#FFF9F0;border:2px dashed #FFD93D;border-radius:16px;padding:12px;min-height:90px;display:flex;flex-wrap:wrap;gap:2px;align-items:flex-end;justify-content:center;">
+        <span style="color:var(--text-light);font-size:13px;width:100%;text-align:center;" id="stash-empty">点击上方奖贴添加...</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">备注</label>
+      <input class="form-input" id="income-note" placeholder="为什么发奖励？">
+    </div>
+    <button class="btn-primary" onclick="confirmIncome()">✨ 确认发放</button>
+  </div>
+</div>
+
+<!-- ========== 弹窗：记支出 ========== -->
+<div class="modal-overlay" id="modal-expense">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div class="modal-title">🛒 记支出</div>
+      <button class="modal-close" onclick="closeModal('modal-expense'); clearExpenseStash();">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">谁花的</label>
+      <input type="hidden" id="expense-child" value="stone">
+      <div class="avatar-picker">
+        <div class="avatar-option selected" id="expense-avatar-stone" onclick="selectChild('expense', 'stone')">
+          🧒
+          <span class="avatar-name">石头</span>
+        </div>
+        <div class="avatar-option" id="expense-avatar-duoduo" onclick="selectChild('expense', 'duoduo')">
+          👶
+          <span class="avatar-name">多多</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">点击奖贴记录花费（再点移除）</label>
+      <div class="currency-picker">
+        <div class="currency-option" onclick="addExpense('star', '🪐', event)">
+          <span class="emoji star-emoji">🪐</span>
+          <span class="name">星球</span>
+        </div>
+        <div class="currency-option" onclick="addExpense('super', '🎫', event)">
+          <span class="emoji super-emoji">🎫</span>
+          <span class="name">超大贴</span>
+        </div>
+        <div class="currency-option" onclick="addExpense('big', '🥇', event)">
+          <span class="emoji big-emoji">🥇</span>
+          <span class="name">大奖贴</span>
+        </div>
+        <div class="currency-option" onclick="addExpense('small', '🥈', event)">
+          <span class="emoji small-emoji">🥈</span>
+          <span class="name">小奖贴</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">花费暂存区 📦</label>
+      <div id="expense-stash-area" style="background:#FFF0F0;border:2px dashed #FF8C42;border-radius:16px;padding:12px;min-height:90px;display:flex;flex-wrap:wrap;gap:2px;align-items:flex-end;justify-content:center;">
+        <span style="color:var(--text-light);font-size:13px;width:100%;text-align:center;" id="expense-stash-empty">点击上方奖贴添加...</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">买了什么</label>
+      <input class="form-input" id="expense-note" placeholder="比如：漫画书">
+    </div>
+    <button class="btn-primary" onclick="confirmExpense()">💸 确认支出</button>
+  </div>
+</div>
+
+<!-- ========== 弹窗：转账 ========== -->
+<div class="modal-overlay" id="modal-transfer">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div class="modal-title">🔄 转账</div>
+      <button class="modal-close" onclick="closeModal('modal-transfer'); clearTransferStash();">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">转账方向（点击切换）</label>
+      <input type="hidden" id="transfer-from" value="stone">
+      <input type="hidden" id="transfer-to" value="duoduo">
+      <div class="transfer-direction" onclick="toggleTransferDirection()">
+        <div class="transfer-avatar" id="transfer-from-avatar">🧒</div>
+        <div class="transfer-arrow" id="transfer-arrow">➡️</div>
+        <div class="transfer-avatar duoduo-avatar" id="transfer-to-avatar">👶</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">点击奖贴添加转账金额（再点移除）</label>
+      <div class="currency-picker">
+        <div class="currency-option" onclick="addTransfer('star', '🪐', event)">
+          <span class="emoji star-emoji">🪐</span>
+          <span class="name">星球</span>
+        </div>
+        <div class="currency-option" onclick="addTransfer('super', '🎫', event)">
+          <span class="emoji super-emoji">🎫</span>
+          <span class="name">超大贴</span>
+        </div>
+        <div class="currency-option" onclick="addTransfer('big', '🥇', event)">
+          <span class="emoji big-emoji">🥇</span>
+          <span class="name">大奖贴</span>
+        </div>
+        <div class="currency-option" onclick="addTransfer('small', '🥈', event)">
+          <span class="emoji small-emoji">🥈</span>
+          <span class="name">小奖贴</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">转账暂存区 📦</label>
+      <div id="transfer-stash-area" style="background:#F0F8FF;border:2px dashed #5BA4E6;border-radius:16px;padding:12px;min-height:90px;display:flex;flex-wrap:wrap;gap:2px;align-items:flex-end;justify-content:center;">
+        <span style="color:var(--text-light);font-size:13px;width:100%;text-align:center;" id="transfer-stash-empty">点击上方奖贴添加...</span>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="confirmTransfer()">🚀 确认转账</button>
+  </div>
+</div>
+
+<!-- ========== 弹窗：新建任务/心愿 ========== -->
+<div class="modal-overlay" id="modal-quest">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div class="modal-title">✨ 发布探险</div>
+      <button class="modal-close" onclick="closeModal('modal-quest')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">类型</label>
+      <select class="form-select" id="quest-type">
+        <option value="task">🎯 任务（完成后得奖励）</option>
+        <option value="wish">⭐ 心愿（存钱目标）</option>
+        <option value="challenge">🏆 挑战（限时任务）</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">标题</label>
+      <input class="form-input" placeholder="比如：整理房间、想买乐高">
+    </div>
+    <div class="form-group">
+      <label class="form-label">奖励 / 目标金额</label>
+      <div class="currency-picker">
+        <div class="currency-option">
+          <span class="emoji">🪐</span>
+          <span class="name">星球</span>
+        </div>
+        <div class="currency-option">
+          <span class="emoji">🎫</span>
+          <span class="name">超大贴</span>
+        </div>
+        <div class="currency-option selected">
+          <span class="emoji">🥇</span>
+          <span class="name">大奖贴</span>
+        </div>
+        <div class="currency-option">
+          <span class="emoji">🥈</span>
+          <span class="name">小奖贴</span>
+        </div>
+      </div>
+      <input class="form-input" type="number" placeholder="数量" value="2">
+    </div>
+    <div class="form-group">
+      <label class="form-label">布置给</label>
+      <select class="form-select">
+        <option>🧒 石头</option>
+        <option>👶 多多</option>
+        <option>👨‍👩‍👧‍👦 两人都可以</option>
+      </select>
+    </div>
+    <button class="btn-primary">发布</button>
+  </div>
+</div>
+
+<script>
+// ========== 示例数据 ==========
+// assignee: 'stone' | 'duoduo' | 'both' - 谁可以领取
+// claimedBy: ['stone'] | ['duoduo'] | ['stone', 'duoduo'] - 已被谁领取
+// completedBy: ['stone'] | ['duoduo'] | ['stone', 'duoduo'] - 已被谁完成
+// rewardSplit: true - 平分奖励（both任务）
+const demoQuests = [
+  { id: 1, type: 'task', title: '整理自己的书包', reward: 5, rewardUnit: 'big', assignee: 'stone', creator: 'parent', claimedBy: [], completedBy: [], icon: '🎒' },
+  { id: 2, type: 'wish', title: '想买新乐高', reward: 500, rewardUnit: 'yuan', assignee: 'stone', creator: 'stone', claimedBy: [], completedBy: [], icon: '🧩', progress: 1505, target: 2000 },
+  { id: 3, type: 'task', title: '帮妈妈拿快递', reward: 2.5, rewardUnit: 'small', assignee: 'duoduo', creator: 'stone', claimedBy: ['duoduo'], completedBy: [], icon: '📦' },
+  { id: 4, type: 'challenge', title: '一周不玩手机游戏', reward: 50, rewardUnit: 'super', assignee: 'both', creator: 'parent', claimedBy: [], completedBy: [], icon: '📱', deadline: '2026-06-17', rewardSplit: true },
+  { id: 5, type: 'task', title: '一起打扫客厅', reward: 10, rewardUnit: 'big', assignee: 'both', creator: 'parent', claimedBy: ['stone', 'duoduo'], completedBy: ['stone', 'duoduo'], icon: '🧹', rewardSplit: true },
+  { id: 6, type: 'wish', title: '存够一个星球', reward: 1000, rewardUnit: 'yuan', assignee: 'duoduo', creator: 'duoduo', claimedBy: ['duoduo'], completedBy: ['duoduo'], icon: '🪐', progress: 1000, target: 1000 },
+];
+
+const unitNames = {
+  star: { emoji: '🪐', name: '星球', value: 1000 },
+  super: { emoji: '🎫', name: '超大贴', value: 50 },
+  big: { emoji: '🥇', name: '大奖贴', value: 5 },
+  small: { emoji: '🥈', name: '小奖贴', value: 2.5 },
+  yuan: { emoji: '💰', name: '元', value: 1 }
+};
+
+// ========== 页面切换 ==========
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.target.closest('.nav-item').classList.add('active');
+  if (page === 'quests') renderQuests2('all');
+}
+
+// ========== 弹窗 ==========
+function openModal(id) {
+  document.getElementById(id).classList.add('active');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+// ========== 头像选择器 ==========
+function selectChild(prefix, childId) {
+  document.getElementById(prefix + '-child').value = childId;
+  // 移除所有选中状态
+  document.getElementById(prefix + '-avatar-stone').classList.remove('selected');
+  document.getElementById(prefix + '-avatar-duoduo').classList.remove('selected');
+  // 添加选中状态
+  document.getElementById(prefix + '-avatar-' + childId).classList.add('selected');
+}
+
+// ========== 转账方向切换 ==========
+let transferDirectionReversed = false;
+function toggleTransferDirection() {
+  transferDirectionReversed = !transferDirectionReversed;
+  const fromInput = document.getElementById('transfer-from');
+  const toInput = document.getElementById('transfer-to');
+  const fromAvatar = document.getElementById('transfer-from-avatar');
+  const toAvatar = document.getElementById('transfer-to-avatar');
+  const arrow = document.getElementById('transfer-arrow');
+
+  if (transferDirectionReversed) {
+    fromInput.value = 'duoduo';
+    toInput.value = 'stone';
+    fromAvatar.textContent = '👶';
+    fromAvatar.classList.add('duoduo-avatar');
+    toAvatar.textContent = '🧒';
+    toAvatar.classList.remove('duoduo-avatar');
+  } else {
+    fromInput.value = 'stone';
+    toInput.value = 'duoduo';
+    fromAvatar.textContent = '🧒';
+    fromAvatar.classList.remove('duoduo-avatar');
+    toAvatar.textContent = '👶';
+    toAvatar.classList.add('duoduo-avatar');
+  }
+
+  // 箭头翻转动画
+  arrow.style.transform = transferDirectionReversed ? 'scaleX(-1)' : 'scaleX(1)';
+}
+
+// ========== 奖贴换算 ==========
+function convertToCurrency(amount) {
+  let remaining = amount;
+  const stars = Math.floor(remaining / 1000); remaining -= stars * 1000;
+  const supers = Math.floor(remaining / 50); remaining -= supers * 50;
+  const bigs = Math.floor(remaining / 5); remaining -= bigs * 5;
+  const smalls = Math.floor(remaining / 2.5);
+  return { stars, supers, bigs, smalls };
+}
+
+// 生成重复的奖贴图标 HTML
+const stickerClassMap = { '🪐': 'sticker-star', '🎫': 'sticker-super', '🥇': 'sticker-big', '🥈': 'sticker-small' };
+
+function renderStickers(count, emoji) {
+  if (count <= 0) return '';
+  const cls = stickerClassMap[emoji] || 'sticker-small';
+
+  // 超大贴特殊处理：最多19个，超过10个分两行
+  if (emoji === '🎫' && count > 10) {
+    const row1 = Array(10).fill(`<span class="currency-sticker ${cls}">${emoji}</span>`).join('');
+    const row2Count = count - 10;
+    const row2 = Array(row2Count).fill(`<span class="currency-sticker ${cls}">${emoji}</span>`).join('');
+    return `<div class="super-sticker-row">${row1}</div><div class="super-sticker-row second-row">${row2}</div>`;
+  }
+
+  // 其他奖贴：一行最多10个，超过显示+n
+  if (count > 10) {
+    const full = Array(10).fill(`<span class="currency-sticker ${cls}">${emoji}</span>`).join('');
+    return full + `<span class="currency-sticker ${cls}">+${count - 10}</span>`;
+  }
+
+  return Array(count).fill(`<span class="currency-sticker ${cls}">${emoji}</span>`).join('');
+}
+
+function formatCurrency(amount) {
+  const c = convertToCurrency(amount);
+  let html = '';
+  html += renderStickers(c.stars, '🪐');
+  html += renderStickers(c.supers, '🎫');
+  html += renderStickers(c.bigs, '🥇');
+  html += renderStickers(c.smalls, '🥈');
+  return html || '<span style="color:var(--text-light);font-size:14px;">空空如也</span>';
+}
+
+function renderBalance(childId, amount) {
+  const el = document.getElementById(childId + '-balance');
+  if (el) el.innerHTML = formatCurrency(amount);
+}
+
+// ========== 渲染探险列表 ==========
+function renderQuests(filter) {
+  const list = document.getElementById('quest-list');
+  const filtered = filter === 'all' ? demoQuests : demoQuests.filter(q => q.type === filter);
+  list.innerHTML = filtered.map(q => renderQuestCard(q)).join('');
+}
+
+function renderQuests2(filter) {
+  const list = document.getElementById('quest-list2');
+  const filtered = filter === 'all' ? demoQuests : demoQuests.filter(q => q.type === filter);
+  list.innerHTML = filtered.map(q => renderQuestCard(q)).join('');
+}
+
+function renderQuestCard(q) {
+  return `
+    <div class="quest-card" onclick="handleQuest(${q.id})">
+      <div class="quest-icon ${q.type}">${q.icon}</div>
+      <div class="quest-info">
+        <div class="quest-title">${q.title}</div>
+        <div class="quest-meta">${getCreatorLabel(q.creator)} · ${getRewardLabel(q)}</div>
+      </div>
+      <div class="quest-avatars">
+        ${renderQuestAvatars(q)}
+      </div>
+      <div>
+        <div class="quest-reward">${formatReward(q.reward, q.rewardUnit, q)}</div>
+        <div class="quest-status ${getStatusClass(q)}">${getStatusLabel(q)}</div>
+      </div>
+    </div>
+  `;
+}
+
+// 渲染任务卡片上的两个孩子头像
+function renderQuestAvatars(q) {
+  // 石头头像状态
+  const stoneCanClaim = q.assignee === 'stone' || q.assignee === 'both';
+  const stoneClaimed = q.claimedBy.includes('stone');
+  const stoneCompleted = q.completedBy.includes('stone');
+  let stoneClass = 'quest-avatar stone-avatar';
+  if (stoneCompleted) stoneClass += ' bright';
+  else if (stoneClaimed) stoneClass += ' bright';
+  else if (stoneCanClaim) stoneClass += ' dim';
+  else stoneClass += ' dim';
+
+  // 多多头像状态
+  const duoCanClaim = q.assignee === 'duoduo' || q.assignee === 'both';
+  const duoClaimed = q.claimedBy.includes('duoduo');
+  const duoCompleted = q.completedBy.includes('duoduo');
+  let duoClass = 'quest-avatar duoduo-avatar';
+  if (duoCompleted) duoClass += ' bright';
+  else if (duoClaimed) duoClass += ' bright';
+  else if (duoCanClaim) duoClass += ' dim';
+  else duoClass += ' dim';
+
+  // 平分标记
+  const splitBadge = q.rewardSplit && q.assignee === 'both' ? '<span class="reward-split">½</span>' : '';
+
+  return `
+    <div class="${stoneClass}">🧒${q.assignee === 'both' && q.rewardSplit ? splitBadge : ''}</div>
+    <div class="${duoClass}">👶</div>
+  `;
+}
+
+function getCreatorLabel(c) {
+  const map = { parent: '👨‍👩 爸妈', stone: '🧒 石头', duoduo: '👶 多多' };
+  return map[c] || c;
+}
+
+function getRewardLabel(q) {
+  if (q.assignee === 'both') {
+    return q.rewardSplit ? '👬 两人平分' : '👬 两人都可领';
+  }
+  return q.assignee === 'stone' ? '🧒 石头专属' : '👶 多多专属';
+}
+
+function getStatusClass(q) {
+  const allCompleted = isQuestCompleted(q);
+  if (allCompleted) return 'status-done';
+  if (q.claimedBy.length > 0) return 'status-claimed';
+  return 'status-pending';
+}
+
+function getStatusLabel(q) {
+  const allCompleted = isQuestCompleted(q);
+  if (allCompleted) return '已完成';
+  if (q.claimedBy.length > 0) {
+    const total = q.assignee === 'both' ? 2 : 1;
+    return `进行中 ${q.claimedBy.length}/${total}`;
+  }
+  return '待领取';
+}
+
+function isQuestCompleted(q) {
+  if (q.assignee === 'both') {
+    return q.completedBy.includes('stone') && q.completedBy.includes('duoduo');
+  }
+  return q.completedBy.includes(q.assignee);
+}
+
+// 用奖贴图标表示奖励（最多显示5个图标）
+function formatReward(amount, unit, q) {
+  const u = unitNames[unit] || unitNames.yuan;
+  if (unit === 'yuan') {
+    return formatCurrency(amount);
+  }
+  // 如果是平分任务且是both，显示每人分得的数量
+  let displayAmount = amount;
+  if (q && q.rewardSplit && q.assignee === 'both') {
+    displayAmount = amount / 2;
+  }
+  const count = Math.min(displayAmount, 6);
+  const icons = Array(Math.floor(count)).fill(u.emoji).join('');
+  const extra = displayAmount > 6 ? `+${Math.floor(displayAmount - 6)}` : '';
+  return `<span style="font-size:18px;letter-spacing:-2px;">${icons}${extra}</span>`;
+}
+
+function handleQuest(id) {
+  const q = demoQuests.find(x => x.id === id);
+  if (!q) return;
+
+  const allCompleted = isQuestCompleted(q);
+  if (allCompleted) {
+    alert(`「${q.title}」已经完成啦！✅`);
+    return;
+  }
+
+  // 判断当前谁可以领取/完成（演示：默认石头操作）
+  const currentChild = 'stone'; // 实际应用中应该从登录状态获取
+
+  // 检查是否有资格
+  const canClaim = q.assignee === currentChild || q.assignee === 'both';
+  if (!canClaim) {
+    alert('这个任务只有 ' + (q.assignee === 'stone' ? '石头' : '多多') + ' 可以领取哦！');
+    return;
+  }
+
+  // 检查是否已领取
+  const alreadyClaimed = q.claimedBy.includes(currentChild);
+  const alreadyCompleted = q.completedBy.includes(currentChild);
+
+  if (!alreadyClaimed) {
+    // 领取任务
+    let rewardText = formatReward(q.reward, q.rewardUnit, q);
+    if (q.rewardSplit && q.assignee === 'both') {
+      rewardText = `每人 ${rewardText}`;
+    }
+    if (confirm(`领取「${q.title}」？\n奖励：${rewardText}`)) {
+      q.claimedBy.push(currentChild);
+      renderQuests('all');
+      renderQuests2('all');
+    }
+  } else if (!alreadyCompleted) {
+    // 完成任务
+    if (confirm(`完成「${q.title}」？\n将发放奖励！`)) {
+      q.completedBy.push(currentChild);
+      // 发放奖励
+      const reward = q.rewardSplit && q.assignee === 'both' ? q.reward / 2 : q.reward;
+      const currentBalance = currentChild === 'stone' ? 1505 : 257.5;
+      renderBalance(currentChild, currentBalance + reward);
+      renderQuests('all');
+      renderQuests2('all');
+    }
+  } else {
+    alert('你已经完成这个任务啦！');
+  }
+}
+
+function filterQuests(type) {
+  document.querySelectorAll('#page-home .filter-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  renderQuests(type);
+}
+function filterQuests2(type) {
+  document.querySelectorAll('#page-quests .filter-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  renderQuests2(type);
+}
+
+function showChildDetail(child) {
+  alert(`查看 ${child === 'stone' ? '石头' : '多多'} 的详细账单（草稿版，功能待完善）`);
+}
+
+// 点击弹窗外部关闭
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => {
+    if (e.target === m) m.classList.remove('active');
+  });
+});
+
+// ========== 暂存区（发奖励用） ==========
+let stash = [];
+
+function toggleStash(type, emoji, event) {
+  // 飞入动画：从点击位置飞到暂存区
+  const startX = event.clientX;
+  const startY = event.clientY;
+  const area = document.getElementById('stash-area');
+  const areaRect = area.getBoundingClientRect();
+  const endX = areaRect.left + areaRect.width / 2 + (stash.length * 30 - 60);
+  const endY = areaRect.top + areaRect.height / 2;
+
+  const flyer = document.createElement('div');
+  flyer.textContent = emoji;
+  flyer.style.cssText = `
+    position: fixed;
+    left: ${startX}px;
+    top: ${startY}px;
+    font-size: ${getEmojiSize(type)}px;
+    z-index: 9999;
+    pointer-events: none;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  `;
+  document.body.appendChild(flyer);
+
+  requestAnimationFrame(() => {
+    flyer.style.left = endX + 'px';
+    flyer.style.top = endY + 'px';
+    flyer.style.transform = 'scale(0.8)';
+  });
+
+  setTimeout(() => {
+    flyer.remove();
+    stash.push({ type, emoji });
+    renderStash();
+  }, 500);
+}
+
+function getEmojiSize(type) {
+  const sizes = { star: 72, super: 48, big: 32, small: 18 };
+  return sizes[type] || 18;
+}
+
+function renderStash() {
+  const area = document.getElementById('stash-area');
+
+  // 清空并重新渲染
+  area.innerHTML = '';
+  if (stash.length === 0) {
+    area.innerHTML = '<span style="color:var(--text-light);font-size:13px;width:100%;text-align:center;" id="stash-empty">点击上方奖贴添加...</span>';
+    return;
+  }
+
+  stash.forEach((item, index) => {
+    const sticker = document.createElement('span');
+    sticker.textContent = item.emoji;
+    sticker.style.fontSize = getEmojiSize(item.type) + 'px';
+    sticker.style.cursor = 'pointer';
+    sticker.style.transition = 'all 0.2s';
+    sticker.style.animation = 'popIn 0.4s ease';
+    sticker.style.display = 'inline-flex';
+    sticker.style.alignItems = 'flex-end';
+    sticker.title = '点击移除';
+    sticker.onclick = () => removeFromStash(index);
+    area.appendChild(sticker);
+  });
+
+  // 添加清空按钮
+  const clearBtn = document.createElement('span');
+  clearBtn.textContent = '❌';
+  clearBtn.style.fontSize = '14px';
+  clearBtn.style.cursor = 'pointer';
+  clearBtn.style.marginLeft = '8px';
+  clearBtn.style.alignSelf = 'center';
+  clearBtn.title = '清空';
+  clearBtn.onclick = clearStash;
+  area.appendChild(clearBtn);
+}
+
+function removeFromStash(index) {
+  stash.splice(index, 1);
+  renderStash();
+}
+
+function clearStash() {
+  stash = [];
+  renderStash();
+}
+
+// 计算暂存区总金额
+function calcStashAmount() {
+  const values = { star: 1000, super: 50, big: 5, small: 2.5 };
+  return stash.reduce((sum, item) => sum + (values[item.type] || 0), 0);
+}
+
+// ========== 确认发放奖励 ==========
+function confirmIncome() {
+  if (stash.length === 0) {
+    alert('请先点击奖贴添加到暂存区！');
+    return;
+  }
+
+  const childId = document.getElementById('income-child').value;
+  const note = document.getElementById('income-note').value || '发放奖励';
+  const amount = calcStashAmount();
+
+  // 发放动画
+  playIncomeAnimation(childId, stash.map(s => s.emoji));
+
+  // 更新余额（演示数据）
+  const currentBalance = childId === 'stone' ? 1505 : 257.5;
+  const newBalance = currentBalance + amount;
+  renderBalance(childId, newBalance);
+
+  alert(`✅ 已向 ${childId === 'stone' ? '石头' : '多多'} 发放奖励！\n${note}`);
+
+  clearStash();
+  closeModal('modal-income');
+}
+
+// ========== 奖贴飞入钱包动画 ==========
+function playIncomeAnimation(childId, emojis) {
+  // 找到目标卡片位置
+  const card = document.querySelector(`.child-card.${childId}`);
+  if (!card) return;
+
+  const cardRect = card.getBoundingClientRect();
+  const startX = window.innerWidth / 2;
+  const startY = window.innerHeight / 2;
+  const endX = cardRect.left + cardRect.width / 2;
+  const endY = cardRect.top + cardRect.height / 2;
+
+  emojis.forEach((emoji, i) => {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.textContent = emoji;
+      el.style.cssText = `
+        position: fixed;
+        left: ${startX}px;
+        top: ${startY}px;
+        font-size: 40px;
+        z-index: 9999;
+        pointer-events: none;
+        transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      `;
+      document.body.appendChild(el);
+
+      // 强制重排后开始动画
+      requestAnimationFrame(() => {
+        el.style.left = endX + 'px';
+        el.style.top = endY + 'px';
+        el.style.transform = 'scale(0.3)';
+        el.style.opacity = '0';
+      });
+
+      // 动画结束后移除
+      setTimeout(() => el.remove(), 1200);
+    }, i * 200);
+  });
+}
+
+// ========== 支出暂存区 ==========
+let expenseStash = [];
+
+function addExpense(type, emoji, event) {
+  const startX = event.clientX;
+  const startY = event.clientY;
+  const area = document.getElementById('expense-stash-area');
+  const areaRect = area.getBoundingClientRect();
+  const endX = areaRect.left + areaRect.width / 2 + (expenseStash.length * 30 - 60);
+  const endY = areaRect.top + areaRect.height / 2;
+
+  const flyer = document.createElement('div');
+  flyer.textContent = emoji;
+  flyer.style.cssText = `
+    position: fixed;
+    left: ${startX}px;
+    top: ${startY}px;
+    font-size: ${getEmojiSize(type)}px;
+    z-index: 9999;
+    pointer-events: none;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  `;
+  document.body.appendChild(flyer);
+
+  requestAnimationFrame(() => {
+    flyer.style.left = endX + 'px';
+    flyer.style.top = endY + 'px';
+    flyer.style.transform = 'scale(0.8)';
+  });
+
+  setTimeout(() => {
+    flyer.remove();
+    expenseStash.push({ type, emoji });
+    renderExpenseStash();
+  }, 500);
+}
+
+function renderExpenseStash() {
+  const area = document.getElementById('expense-stash-area');
+  area.innerHTML = '';
+  if (expenseStash.length === 0) {
+    area.innerHTML = '<span style="color:var(--text-light);font-size:13px;width:100%;text-align:center;" id="expense-stash-empty">点击上方奖贴添加...</span>';
+    return;
+  }
+  expenseStash.forEach((item, index) => {
+    const sticker = document.createElement('span');
+    sticker.textContent = item.emoji;
+    sticker.style.fontSize = getEmojiSize(item.type) + 'px';
+    sticker.style.cursor = 'pointer';
+    sticker.style.animation = 'popIn 0.4s ease';
+    sticker.style.display = 'inline-flex';
+    sticker.style.alignItems = 'flex-end';
+    sticker.title = '点击移除';
+    sticker.onclick = () => { expenseStash.splice(index, 1); renderExpenseStash(); };
+    area.appendChild(sticker);
+  });
+  const clearBtn = document.createElement('span');
+  clearBtn.textContent = '❌';
+  clearBtn.style.fontSize = '14px'; clearBtn.style.cursor = 'pointer'; clearBtn.style.marginLeft = '8px'; clearBtn.style.alignSelf = 'center';
+  clearBtn.onclick = clearExpenseStash;
+  area.appendChild(clearBtn);
+}
+
+function clearExpenseStash() { expenseStash = []; renderExpenseStash(); }
+
+function confirmExpense() {
+  if (expenseStash.length === 0) { alert('请先添加奖贴！'); return; }
+  const childId = document.getElementById('expense-child').value;
+  const note = document.getElementById('expense-note').value || '消费支出';
+  const amount = expenseStash.reduce((sum, item) => sum + ({star:1000,super:50,big:5,small:2.5}[item.type]||0), 0);
+  // 扣除余额
+  const currentBalance = childId === 'stone' ? 1505 : 257.5;
+  const newBalance = currentBalance - amount;
+  renderBalance(childId, newBalance);
+  alert(`💸 已记录支出！\n${note}`);
+  clearExpenseStash();
+  closeModal('modal-expense');
+}
+
+// ========== 转账暂存区 ==========
+let transferStash = [];
+
+function addTransfer(type, emoji, event) {
+  const startX = event.clientX;
+  const startY = event.clientY;
+  const area = document.getElementById('transfer-stash-area');
+  const areaRect = area.getBoundingClientRect();
+  const endX = areaRect.left + areaRect.width / 2 + (transferStash.length * 30 - 60);
+  const endY = areaRect.top + areaRect.height / 2;
+
+  const flyer = document.createElement('div');
+  flyer.textContent = emoji;
+  flyer.style.cssText = `
+    position: fixed;
+    left: ${startX}px;
+    top: ${startY}px;
+    font-size: ${getEmojiSize(type)}px;
+    z-index: 9999;
+    pointer-events: none;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  `;
+  document.body.appendChild(flyer);
+
+  requestAnimationFrame(() => {
+    flyer.style.left = endX + 'px';
+    flyer.style.top = endY + 'px';
+    flyer.style.transform = 'scale(0.8)';
+  });
+
+  setTimeout(() => {
+    flyer.remove();
+    transferStash.push({ type, emoji });
+    renderTransferStash();
+  }, 500);
+}
+
+function renderTransferStash() {
+  const area = document.getElementById('transfer-stash-area');
+  area.innerHTML = '';
+  if (transferStash.length === 0) {
+    area.innerHTML = '<span style="color:var(--text-light);font-size:13px;width:100%;text-align:center;" id="transfer-stash-empty">点击上方奖贴添加...</span>';
+    return;
+  }
+  transferStash.forEach((item, index) => {
+    const sticker = document.createElement('span');
+    sticker.textContent = item.emoji;
+    sticker.style.fontSize = getEmojiSize(item.type) + 'px';
+    sticker.style.cursor = 'pointer';
+    sticker.style.animation = 'popIn 0.4s ease';
+    sticker.style.display = 'inline-flex';
+    sticker.style.alignItems = 'flex-end';
+    sticker.title = '点击移除';
+    sticker.onclick = () => { transferStash.splice(index, 1); renderTransferStash(); };
+    area.appendChild(sticker);
+  });
+  const clearBtn = document.createElement('span');
+  clearBtn.textContent = '❌';
+  clearBtn.style.fontSize = '14px'; clearBtn.style.cursor = 'pointer'; clearBtn.style.marginLeft = '8px'; clearBtn.style.alignSelf = 'center';
+  clearBtn.onclick = clearTransferStash;
+  area.appendChild(clearBtn);
+}
+
+function clearTransferStash() { transferStash = []; renderTransferStash(); }
+
+function confirmTransfer() {
+  if (transferStash.length === 0) { alert('请先添加奖贴！'); return; }
+  const from = document.getElementById('transfer-from').value;
+  const to = document.getElementById('transfer-to').value;
+  if (from === to) { alert('不能转给自己！'); return; }
+  const amount = transferStash.reduce((sum, item) => sum + ({star:1000,super:50,big:5,small:2.5}[item.type]||0), 0);
+  // 扣除转出方，增加转入方
+  const fromBalance = from === 'stone' ? 1505 : 257.5;
+  const toBalance = to === 'stone' ? 1505 : 257.5;
+  renderBalance(from, fromBalance - amount);
+  renderBalance(to, toBalance + amount);
+  // 转账动画：从一方飞到另一方
+  playTransferAnimation(from, to, transferStash.map(s => s.emoji));
+  alert(`🚀 转账成功！`);
+  clearTransferStash();
+  closeModal('modal-transfer');
+}
+
+function playTransferAnimation(fromId, toId, emojis) {
+  const fromCard = document.querySelector(`.child-card.${fromId}`);
+  const toCard = document.querySelector(`.child-card.${toId}`);
+  if (!fromCard || !toCard) return;
+  const fromRect = fromCard.getBoundingClientRect();
+  const toRect = toCard.getBoundingClientRect();
+  const startX = fromRect.left + fromRect.width / 2;
+  const startY = fromRect.top + fromRect.height / 2;
+  const endX = toRect.left + toRect.width / 2;
+  const endY = toRect.top + toRect.height / 2;
+
+  emojis.forEach((emoji, i) => {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.textContent = emoji;
+      el.style.cssText = `
+        position: fixed;
+        left: ${startX}px;
+        top: ${startY}px;
+        font-size: 40px;
+        z-index: 9999;
+        pointer-events: none;
+        transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      `;
+      document.body.appendChild(el);
+      requestAnimationFrame(() => {
+        el.style.left = endX + 'px';
+        el.style.top = endY + 'px';
+        el.style.transform = 'scale(0.3)';
+        el.style.opacity = '0';
+      });
+      setTimeout(() => el.remove(), 1200);
+    }, i * 200);
+  });
+}
+
+// 添加 popIn 动画
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+  @keyframes popIn {
+    0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+    60% { transform: scale(1.2) rotate(5deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+`;
+document.head.appendChild(styleSheet);
+
+// ========== 初始化 ==========
+renderQuests('all');
+renderBalance('stone', 1505);
+renderBalance('duoduo', 257.5);
+</script>
+
+</body>
+</html>
