@@ -312,8 +312,8 @@
       align-items: center;
       justify-content: center;
       font-size: 28px;
-      background: #F0F0F5;
-      border: 3px solid transparent;
+      background: #E8F4FD;
+      border: 3px solid #B3D9F7;
       transition: all 0.3s;
       position: relative;
       cursor: pointer;
@@ -323,25 +323,19 @@
     .quest-avatar:active {
       transform: scale(0.9);
     }
-    .quest-avatar.stone-avatar {
-      background: #E8F4FD;
-      border-color: #B3D9F7;
-    }
     .quest-avatar.duoduo-avatar {
       background: #E8F8E8;
       border-color: #B3E5B3;
     }
     .quest-avatar.dim {
-      opacity: 0.3;
-      filter: grayscale(0.8);
-      border-color: #DDD;
-      background: #F5F5F5;
+      opacity: 0.7;
+      transform: scale(0.95);
     }
     .quest-avatar.bright {
       opacity: 1;
-      filter: none;
-      transform: scale(1.1);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transform: scale(1.08);
+      box-shadow: 0 0 0 4px rgba(255, 217, 61, 0.4), 0 0 25px rgba(255, 217, 61, 0.6);
+      border-color: var(--star-color);
     }
     .quest-avatar .reward-split {
       position: absolute;
@@ -524,18 +518,24 @@
       align-items: center;
       justify-content: center;
       font-size: 36px;
-      background: #F5F5FA;
-      border: 3px solid transparent;
+      background: #E8F4FD;
+      border: 3px solid #B3D9F7;
       cursor: pointer;
       transition: all 0.3s;
       position: relative;
       overflow: hidden;
+      opacity: 0.75;
+      transform: scale(0.95);
+    }
+    .avatar-option.duoduo-option {
+      background: #E8F8E8;
+      border-color: #B3E5B3;
     }
     .avatar-option.selected {
+      opacity: 1;
       border-color: var(--star-color);
-      box-shadow: 0 0 20px rgba(255, 217, 61, 0.6), 0 0 40px rgba(255, 217, 61, 0.3);
+      box-shadow: 0 0 0 4px rgba(255, 217, 61, 0.4), 0 0 25px rgba(255, 217, 61, 0.6);
       transform: scale(1.1);
-      background: #FFF8DC;
     }
     .avatar-option .avatar-name {
       position: absolute;
@@ -759,7 +759,7 @@
           <img src="shitou.png" alt="石头">
           <span class="avatar-name">石头</span>
         </div>
-        <div class="avatar-option" id="income-avatar-duoduo" onclick="selectChild('income', 'duoduo')">
+        <div class="avatar-option duoduo-option" id="income-avatar-duoduo" onclick="selectChild('income', 'duoduo')">
           <img src="duoduo.png" alt="多多">
           <span class="avatar-name">多多</span>
         </div>
@@ -819,7 +819,7 @@
           <img src="shitou.png" alt="石头">
           <span class="avatar-name">石头</span>
         </div>
-        <div class="avatar-option" id="expense-avatar-duoduo" onclick="selectChild('expense', 'duoduo')">
+        <div class="avatar-option duoduo-option" id="expense-avatar-duoduo" onclick="selectChild('expense', 'duoduo')">
           <img src="duoduo.png" alt="多多">
           <span class="avatar-name">多多</span>
         </div>
@@ -1128,21 +1128,17 @@ function renderQuestAvatars(q) {
   const stoneCanClaim = q.assignee === 'stone' || q.assignee === 'both';
   const stoneClaimed = q.claimedBy.includes('stone');
   const stoneCompleted = q.completedBy.includes('stone');
-  let stoneClass = 'quest-avatar stone-avatar';
-  if (stoneCompleted) stoneClass += ' bright';
-  else if (stoneClaimed) stoneClass += ' bright';
+  let stoneClass = 'quest-avatar';
+  if (stoneCompleted || stoneClaimed) stoneClass += ' bright';
   else if (stoneCanClaim) stoneClass += ' dim';
-  else stoneClass += ' dim';
 
   // 多多头像状态
   const duoCanClaim = q.assignee === 'duoduo' || q.assignee === 'both';
   const duoClaimed = q.claimedBy.includes('duoduo');
   const duoCompleted = q.completedBy.includes('duoduo');
   let duoClass = 'quest-avatar duoduo-avatar';
-  if (duoCompleted) duoClass += ' bright';
-  else if (duoClaimed) duoClass += ' bright';
+  if (duoCompleted || duoClaimed) duoClass += ' bright';
   else if (duoCanClaim) duoClass += ' dim';
-  else duoClass += ' dim';
 
   // 平分标记
   const splitBadge = q.rewardSplit && q.assignee === 'both' ? '<span class="reward-split">½</span>' : '';
