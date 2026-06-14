@@ -492,15 +492,28 @@
     }
     /* 全局奖贴尺寸 - 统一使用这些类 */
     .sticker-star { font-size: 72px; }
-    .sticker-super { font-size: 48px; }
-    .sticker-big { font-size: 32px; }
-    .sticker-small { font-size: 18px; }
+    .sticker-super { width: 48px; height: 48px; }
+    .sticker-big { width: 32px; height: 32px; }
+    .sticker-small { width: 18px; height: 18px; }
+
+    /* 奖贴图片样式：圆角方框 + 背景色 */
+    .sticker-img {
+      object-fit: contain;
+      border-radius: 8px;
+      padding: 2px;
+      background: #FFF;
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .sticker-img.super-bg { background: #FFF0E6; }
+    .sticker-img.big-bg { background: #FFE8F0; }
+    .sticker-img.small-bg { background: #F3E8FF; }
 
     .currency-option .emoji { display: block; margin-bottom: 2px; transition: transform 0.15s; }
     .currency-option .emoji.star-emoji { font-size: 72px; }
-    .currency-option .emoji.super-emoji { font-size: 48px; }
-    .currency-option .emoji.big-emoji { font-size: 32px; }
-    .currency-option .emoji.small-emoji { font-size: 18px; }
+    .currency-option .emoji.super-emoji { width: 48px; height: 48px; }
+    .currency-option .emoji.big-emoji { width: 32px; height: 32px; }
+    .currency-option .emoji.small-emoji { width: 18px; height: 18px; }
     .currency-option:active .emoji { transform: scale(0.85); }
 
     /* 头像选择器 */
@@ -768,23 +781,23 @@
     <div class="form-group">
       <label class="form-label">点击奖贴添加（再点移除）</label>
       <div class="currency-picker">
-        <div class="currency-option" onclick="toggleStash('star', '🪐', event)">
+        <div class="currency-option" onclick="toggleStash('star', event)">
           <span class="emoji star-emoji">🪐</span>
           <span class="name">星球</span>
           <span class="value">¥1000</span>
         </div>
-        <div class="currency-option" onclick="toggleStash('super', '🎫', event)">
-          <span class="emoji super-emoji">🎫</span>
+        <div class="currency-option" onclick="toggleStash('super', event)">
+          <img class="emoji super-emoji" src="chaodajiangtie.png" alt="超大贴">
           <span class="name">超大贴</span>
           <span class="value">¥50</span>
         </div>
-        <div class="currency-option" onclick="toggleStash('big', '🥇', event)">
-          <span class="emoji big-emoji">🥇</span>
+        <div class="currency-option" onclick="toggleStash('big', event)">
+          <img class="emoji big-emoji" src="dajiangtie.png" alt="大奖贴">
           <span class="name">大奖贴</span>
           <span class="value">¥5</span>
         </div>
-        <div class="currency-option" onclick="toggleStash('small', '🥈', event)">
-          <span class="emoji small-emoji">🥈</span>
+        <div class="currency-option" onclick="toggleStash('small', event)">
+          <img class="emoji small-emoji" src="xiaojiangtie.png" alt="小奖贴">
           <span class="name">小奖贴</span>
           <span class="value">¥2.5</span>
         </div>
@@ -828,20 +841,20 @@
     <div class="form-group">
       <label class="form-label">点击奖贴记录花费（再点移除）</label>
       <div class="currency-picker">
-        <div class="currency-option" onclick="addExpense('star', '🪐', event)">
+        <div class="currency-option" onclick="addExpense('star', event)">
           <span class="emoji star-emoji">🪐</span>
           <span class="name">星球</span>
         </div>
-        <div class="currency-option" onclick="addExpense('super', '🎫', event)">
-          <span class="emoji super-emoji">🎫</span>
+        <div class="currency-option" onclick="addExpense('super', event)">
+          <img class="emoji super-emoji" src="chaodajiangtie.png" alt="超大贴">
           <span class="name">超大贴</span>
         </div>
-        <div class="currency-option" onclick="addExpense('big', '🥇', event)">
-          <span class="emoji big-emoji">🥇</span>
+        <div class="currency-option" onclick="addExpense('big', event)">
+          <img class="emoji big-emoji" src="dajiangtie.png" alt="大奖贴">
           <span class="name">大奖贴</span>
         </div>
-        <div class="currency-option" onclick="addExpense('small', '🥈', event)">
-          <span class="emoji small-emoji">🥈</span>
+        <div class="currency-option" onclick="addExpense('small', event)">
+          <img class="emoji small-emoji" src="xiaojiangtie.png" alt="小奖贴">
           <span class="name">小奖贴</span>
         </div>
       </div>
@@ -880,20 +893,20 @@
     <div class="form-group">
       <label class="form-label">点击奖贴添加转账金额（再点移除）</label>
       <div class="currency-picker">
-        <div class="currency-option" onclick="addTransfer('star', '🪐', event)">
+        <div class="currency-option" onclick="addTransfer('star', event)">
           <span class="emoji star-emoji">🪐</span>
           <span class="name">星球</span>
         </div>
-        <div class="currency-option" onclick="addTransfer('super', '🎫', event)">
-          <span class="emoji super-emoji">🎫</span>
+        <div class="currency-option" onclick="addTransfer('super', event)">
+          <img class="emoji super-emoji" src="chaodajiangtie.png" alt="超大贴">
           <span class="name">超大贴</span>
         </div>
-        <div class="currency-option" onclick="addTransfer('big', '🥇', event)">
-          <span class="emoji big-emoji">🥇</span>
+        <div class="currency-option" onclick="addTransfer('big', event)">
+          <img class="emoji big-emoji" src="dajiangtie.png" alt="大奖贴">
           <span class="name">大奖贴</span>
         </div>
-        <div class="currency-option" onclick="addTransfer('small', '🥈', event)">
-          <span class="emoji small-emoji">🥈</span>
+        <div class="currency-option" onclick="addTransfer('small', event)">
+          <img class="emoji small-emoji" src="xiaojiangtie.png" alt="小奖贴">
           <span class="name">小奖贴</span>
         </div>
       </div>
@@ -935,15 +948,15 @@
           <span class="name">星球</span>
         </div>
         <div class="currency-option">
-          <span class="emoji">🎫</span>
+          <img class="emoji" src="chaodajiangtie.png" alt="超大贴" style="width:32px;height:32px;">
           <span class="name">超大贴</span>
         </div>
         <div class="currency-option selected">
-          <span class="emoji">🥇</span>
+          <img class="emoji" src="dajiangtie.png" alt="大奖贴" style="width:28px;height:28px;">
           <span class="name">大奖贴</span>
         </div>
         <div class="currency-option">
-          <span class="emoji">🥈</span>
+          <img class="emoji" src="xiaojiangtie.png" alt="小奖贴" style="width:24px;height:24px;">
           <span class="name">小奖贴</span>
         </div>
       </div>
@@ -1051,37 +1064,57 @@ function convertToCurrency(amount) {
   return { stars, supers, bigs, smalls };
 }
 
-// 生成重复的奖贴图标 HTML
-const stickerClassMap = { '🪐': 'sticker-star', '🎫': 'sticker-super', '🥇': 'sticker-big', '🥈': 'sticker-small' };
+// 奖贴配置：星球用 emoji，其他用图片
+const stickerConfig = {
+  star: { emoji: '🪐', img: null, size: 72, bg: '', name: '星球' },
+  super: { emoji: null, img: 'chaodajiangtie.png', size: 48, bg: 'super-bg', name: '超大贴' },
+  big: { emoji: null, img: 'dajiangtie.png', size: 32, bg: 'big-bg', name: '大奖贴' },
+  small: { emoji: null, img: 'xiaojiangtie.png', size: 18, bg: 'small-bg', name: '小奖贴' }
+};
 
-function renderStickers(count, emoji) {
+// 生成单个奖贴 HTML
+function getStickerHtml(type, sizeOverride) {
+  const cfg = stickerConfig[type];
+  if (!cfg) return '';
+  const size = sizeOverride || cfg.size;
+  if (cfg.emoji) {
+    return `<span class="currency-sticker sticker-${type}" style="font-size:${size}px;">${cfg.emoji}</span>`;
+  }
+  return `<img class="currency-sticker sticker-${type} sticker-img ${cfg.bg}" src="${cfg.img}" alt="${cfg.name}" style="width:${size}px;height:${size}px;">`;
+}
+
+// 生成重复的奖贴图标 HTML
+function renderStickers(count, type) {
   if (count <= 0) return '';
-  const cls = stickerClassMap[emoji] || 'sticker-small';
+  const cfg = stickerConfig[type];
+  if (!cfg) return '';
+
+  const single = getStickerHtml(type);
 
   // 超大贴特殊处理：最多19个，超过10个分两行
-  if (emoji === '🎫' && count > 10) {
-    const row1 = Array(10).fill(`<span class="currency-sticker ${cls}">${emoji}</span>`).join('');
+  if (type === 'super' && count > 10) {
+    const row1 = Array(10).fill(single).join('');
     const row2Count = count - 10;
-    const row2 = Array(row2Count).fill(`<span class="currency-sticker ${cls}">${emoji}</span>`).join('');
+    const row2 = Array(row2Count).fill(single).join('');
     return `<div class="super-sticker-row">${row1}</div><div class="super-sticker-row second-row">${row2}</div>`;
   }
 
   // 其他奖贴：一行最多10个，超过显示+n
   if (count > 10) {
-    const full = Array(10).fill(`<span class="currency-sticker ${cls}">${emoji}</span>`).join('');
-    return full + `<span class="currency-sticker ${cls}">+${count - 10}</span>`;
+    const full = Array(10).fill(single).join('');
+    return full + `<span class="currency-sticker sticker-${type}" style="font-size:${cfg.size}px;">+${count - 10}</span>`;
   }
 
-  return Array(count).fill(`<span class="currency-sticker ${cls}">${emoji}</span>`).join('');
+  return Array(count).fill(single).join('');
 }
 
 function formatCurrency(amount) {
   const c = convertToCurrency(amount);
   let html = '';
-  html += renderStickers(c.stars, '🪐');
-  html += renderStickers(c.supers, '🎫');
-  html += renderStickers(c.bigs, '🥇');
-  html += renderStickers(c.smalls, '🥈');
+  html += renderStickers(c.stars, 'star');
+  html += renderStickers(c.supers, 'super');
+  html += renderStickers(c.bigs, 'big');
+  html += renderStickers(c.smalls, 'small');
   return html || '<span style="color:var(--text-light);font-size:14px;">空空如也</span>';
 }
 
@@ -1197,19 +1230,23 @@ function isQuestCompleted(q) {
 
 // 用奖贴图标表示奖励（最多显示5个图标）
 function formatReward(amount, unit, q) {
-  const u = unitNames[unit] || unitNames.yuan;
   if (unit === 'yuan') {
     return formatCurrency(amount);
   }
+  const cfg = stickerConfig[unit];
+  if (!cfg) return '';
   // 如果是平分任务且是both，显示每人分得的数量
   let displayAmount = amount;
   if (q && q.rewardSplit && q.assignee === 'both') {
     displayAmount = amount / 2;
   }
-  const count = Math.min(displayAmount, 6);
-  const icons = Array(Math.floor(count)).fill(u.emoji).join('');
+  const count = Math.min(Math.floor(displayAmount), 6);
   const extra = displayAmount > 6 ? `+${Math.floor(displayAmount - 6)}` : '';
-  return `<span style="font-size:18px;letter-spacing:-2px;">${icons}${extra}</span>`;
+  let icons = '';
+  for (let i = 0; i < count; i++) {
+    icons += getStickerHtml(unit, 22);
+  }
+  return `<span style="display:inline-flex;align-items:flex-end;gap:1px;white-space:nowrap;">${icons}<span style="font-size:13px;color:var(--text-light);">${extra}</span></span>`;
 }
 
 // 点击头像领取任务
@@ -1302,7 +1339,10 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
 // ========== 暂存区（发奖励用） ==========
 let stash = [];
 
-function toggleStash(type, emoji, event) {
+function toggleStash(type, event) {
+  const cfg = stickerConfig[type];
+  if (!cfg) return;
+
   // 飞入动画：从点击位置飞到暂存区
   const startX = event.clientX;
   const startY = event.clientY;
@@ -1312,16 +1352,21 @@ function toggleStash(type, emoji, event) {
   const endY = areaRect.top + areaRect.height / 2;
 
   const flyer = document.createElement('div');
-  flyer.textContent = emoji;
   flyer.style.cssText = `
     position: fixed;
     left: ${startX}px;
     top: ${startY}px;
-    font-size: ${getEmojiSize(type)}px;
     z-index: 9999;
     pointer-events: none;
     transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   `;
+
+  if (cfg.img) {
+    flyer.innerHTML = `<img src="${cfg.img}" style="width:${cfg.size}px;height:${cfg.size}px;border-radius:6px;background:${getStickerBgColor(type)};padding:2px;">`;
+  } else {
+    flyer.textContent = cfg.emoji;
+    flyer.style.fontSize = cfg.size + 'px';
+  }
   document.body.appendChild(flyer);
 
   requestAnimationFrame(() => {
@@ -1332,14 +1377,18 @@ function toggleStash(type, emoji, event) {
 
   setTimeout(() => {
     flyer.remove();
-    stash.push({ type, emoji });
+    stash.push({ type });
     renderStash();
   }, 500);
 }
 
+function getStickerBgColor(type) {
+  const colors = { star: '#FFF8DC', super: '#FFF0E6', big: '#FFE8F0', small: '#F3E8FF' };
+  return colors[type] || '#FFF';
+}
+
 function getEmojiSize(type) {
-  const sizes = { star: 72, super: 48, big: 32, small: 18 };
-  return sizes[type] || 18;
+  return stickerConfig[type] ? stickerConfig[type].size : 18;
 }
 
 function renderStash() {
@@ -1353,9 +1402,9 @@ function renderStash() {
   }
 
   stash.forEach((item, index) => {
-    const sticker = document.createElement('span');
-    sticker.textContent = item.emoji;
-    sticker.style.fontSize = getEmojiSize(item.type) + 'px';
+    const wrapper = document.createElement('span');
+    wrapper.innerHTML = getStickerHtml(item.type);
+    const sticker = wrapper.firstChild;
     sticker.style.cursor = 'pointer';
     sticker.style.transition = 'all 0.2s';
     sticker.style.animation = 'popIn 0.4s ease';
@@ -1406,7 +1455,7 @@ function confirmIncome() {
   const amount = calcStashAmount();
 
   // 发放动画
-  playIncomeAnimation(childId, stash.map(s => s.emoji));
+  playIncomeAnimation(childId, stash.map(s => s.type));
 
   // 更新余额（演示数据）
   const currentBalance = childId === 'stone' ? 1505 : 257.5;
@@ -1420,8 +1469,7 @@ function confirmIncome() {
 }
 
 // ========== 奖贴飞入钱包动画 ==========
-function playIncomeAnimation(childId, emojis) {
-  // 找到目标卡片位置
+function playIncomeAnimation(childId, types) {
   const card = document.querySelector(`.child-card.${childId}`);
   if (!card) return;
 
@@ -1431,22 +1479,26 @@ function playIncomeAnimation(childId, emojis) {
   const endX = cardRect.left + cardRect.width / 2;
   const endY = cardRect.top + cardRect.height / 2;
 
-  emojis.forEach((emoji, i) => {
+  types.forEach((type, i) => {
     setTimeout(() => {
+      const cfg = stickerConfig[type];
       const el = document.createElement('div');
-      el.textContent = emoji;
       el.style.cssText = `
         position: fixed;
         left: ${startX}px;
         top: ${startY}px;
-        font-size: 40px;
         z-index: 9999;
         pointer-events: none;
         transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       `;
+      if (cfg.img) {
+        el.innerHTML = `<img src="${cfg.img}" style="width:40px;height:40px;border-radius:6px;background:${getStickerBgColor(type)};padding:2px;">`;
+      } else {
+        el.textContent = cfg.emoji;
+        el.style.fontSize = '40px';
+      }
       document.body.appendChild(el);
 
-      // 强制重排后开始动画
       requestAnimationFrame(() => {
         el.style.left = endX + 'px';
         el.style.top = endY + 'px';
@@ -1454,7 +1506,6 @@ function playIncomeAnimation(childId, emojis) {
         el.style.opacity = '0';
       });
 
-      // 动画结束后移除
       setTimeout(() => el.remove(), 1200);
     }, i * 200);
   });
@@ -1463,7 +1514,9 @@ function playIncomeAnimation(childId, emojis) {
 // ========== 支出暂存区 ==========
 let expenseStash = [];
 
-function addExpense(type, emoji, event) {
+function addExpense(type, event) {
+  const cfg = stickerConfig[type];
+  if (!cfg) return;
   const startX = event.clientX;
   const startY = event.clientY;
   const area = document.getElementById('expense-stash-area');
@@ -1472,16 +1525,20 @@ function addExpense(type, emoji, event) {
   const endY = areaRect.top + areaRect.height / 2;
 
   const flyer = document.createElement('div');
-  flyer.textContent = emoji;
   flyer.style.cssText = `
     position: fixed;
     left: ${startX}px;
     top: ${startY}px;
-    font-size: ${getEmojiSize(type)}px;
     z-index: 9999;
     pointer-events: none;
     transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   `;
+  if (cfg.img) {
+    flyer.innerHTML = `<img src="${cfg.img}" style="width:${cfg.size}px;height:${cfg.size}px;border-radius:6px;background:${getStickerBgColor(type)};padding:2px;">`;
+  } else {
+    flyer.textContent = cfg.emoji;
+    flyer.style.fontSize = cfg.size + 'px';
+  }
   document.body.appendChild(flyer);
 
   requestAnimationFrame(() => {
@@ -1492,7 +1549,7 @@ function addExpense(type, emoji, event) {
 
   setTimeout(() => {
     flyer.remove();
-    expenseStash.push({ type, emoji });
+    expenseStash.push({ type });
     renderExpenseStash();
   }, 500);
 }
@@ -1505,10 +1562,11 @@ function renderExpenseStash() {
     return;
   }
   expenseStash.forEach((item, index) => {
-    const sticker = document.createElement('span');
-    sticker.textContent = item.emoji;
-    sticker.style.fontSize = getEmojiSize(item.type) + 'px';
+    const wrapper = document.createElement('span');
+    wrapper.innerHTML = getStickerHtml(item.type);
+    const sticker = wrapper.firstChild;
     sticker.style.cursor = 'pointer';
+    sticker.style.transition = 'all 0.2s';
     sticker.style.animation = 'popIn 0.4s ease';
     sticker.style.display = 'inline-flex';
     sticker.style.alignItems = 'flex-end';
@@ -1542,7 +1600,9 @@ function confirmExpense() {
 // ========== 转账暂存区 ==========
 let transferStash = [];
 
-function addTransfer(type, emoji, event) {
+function addTransfer(type, event) {
+  const cfg = stickerConfig[type];
+  if (!cfg) return;
   const startX = event.clientX;
   const startY = event.clientY;
   const area = document.getElementById('transfer-stash-area');
@@ -1551,16 +1611,20 @@ function addTransfer(type, emoji, event) {
   const endY = areaRect.top + areaRect.height / 2;
 
   const flyer = document.createElement('div');
-  flyer.textContent = emoji;
   flyer.style.cssText = `
     position: fixed;
     left: ${startX}px;
     top: ${startY}px;
-    font-size: ${getEmojiSize(type)}px;
     z-index: 9999;
     pointer-events: none;
     transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   `;
+  if (cfg.img) {
+    flyer.innerHTML = `<img src="${cfg.img}" style="width:${cfg.size}px;height:${cfg.size}px;border-radius:6px;background:${getStickerBgColor(type)};padding:2px;">`;
+  } else {
+    flyer.textContent = cfg.emoji;
+    flyer.style.fontSize = cfg.size + 'px';
+  }
   document.body.appendChild(flyer);
 
   requestAnimationFrame(() => {
@@ -1571,7 +1635,7 @@ function addTransfer(type, emoji, event) {
 
   setTimeout(() => {
     flyer.remove();
-    transferStash.push({ type, emoji });
+    transferStash.push({ type });
     renderTransferStash();
   }, 500);
 }
@@ -1584,10 +1648,11 @@ function renderTransferStash() {
     return;
   }
   transferStash.forEach((item, index) => {
-    const sticker = document.createElement('span');
-    sticker.textContent = item.emoji;
-    sticker.style.fontSize = getEmojiSize(item.type) + 'px';
+    const wrapper = document.createElement('span');
+    wrapper.innerHTML = getStickerHtml(item.type);
+    const sticker = wrapper.firstChild;
     sticker.style.cursor = 'pointer';
+    sticker.style.transition = 'all 0.2s';
     sticker.style.animation = 'popIn 0.4s ease';
     sticker.style.display = 'inline-flex';
     sticker.style.alignItems = 'flex-end';
@@ -1616,13 +1681,13 @@ function confirmTransfer() {
   renderBalance(from, fromBalance - amount);
   renderBalance(to, toBalance + amount);
   // 转账动画：从一方飞到另一方
-  playTransferAnimation(from, to, transferStash.map(s => s.emoji));
+  playTransferAnimation(from, to, transferStash.map(s => s.type));
   alert(`🚀 转账成功！`);
   clearTransferStash();
   closeModal('modal-transfer');
 }
 
-function playTransferAnimation(fromId, toId, emojis) {
+function playTransferAnimation(fromId, toId, types) {
   const fromCard = document.querySelector(`.child-card.${fromId}`);
   const toCard = document.querySelector(`.child-card.${toId}`);
   if (!fromCard || !toCard) return;
@@ -1633,19 +1698,24 @@ function playTransferAnimation(fromId, toId, emojis) {
   const endX = toRect.left + toRect.width / 2;
   const endY = toRect.top + toRect.height / 2;
 
-  emojis.forEach((emoji, i) => {
+  types.forEach((type, i) => {
     setTimeout(() => {
+      const cfg = stickerConfig[type];
       const el = document.createElement('div');
-      el.textContent = emoji;
       el.style.cssText = `
         position: fixed;
         left: ${startX}px;
         top: ${startY}px;
-        font-size: 40px;
         z-index: 9999;
         pointer-events: none;
         transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       `;
+      if (cfg.img) {
+        el.innerHTML = `<img src="${cfg.img}" style="width:40px;height:40px;border-radius:6px;background:${getStickerBgColor(type)};padding:2px;">`;
+      } else {
+        el.textContent = cfg.emoji;
+        el.style.fontSize = '40px';
+      }
       document.body.appendChild(el);
       requestAnimationFrame(() => {
         el.style.left = endX + 'px';
