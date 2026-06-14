@@ -20,10 +20,13 @@
 
 ```
 /Users/zhanghui/zhanghuihub/家庭/石头多多理财小助手/
-├── index.html      # 主应用文件（所有 HTML/CSS/JS 都在这一个文件里）
-├── shitou.png      # 石头的头像
-├── duoduo.png      # 多多的头像
-└── README.md       # 本说明文档
+├── index.html           # 主应用文件（所有 HTML/CSS/JS 都在这一个文件里）
+├── shitou.png           # 石头的头像
+├── duoduo.png           # 多多的头像
+├── xiaojiangtie.png     # 小奖贴图标
+├── dajiangtie.png       # 大奖贴图标
+├── chaodajiangtie.png   # 超大贴图标
+└── README.md            # 本说明文档
 ```
 
 > 本项目采用**单文件应用**架构，所有界面、样式、逻辑都写在 `index.html` 中，方便零基础维护和部署。
