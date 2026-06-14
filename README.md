@@ -19,7 +19,7 @@
 ## 文件结构
 
 ```
-/Users/zhanghui/Documents/石头多多理财小助手/
+/Users/zhanghui/zhanghuihub/家庭/石头多多理财小助手/
 ├── index.html      # 主应用文件（所有 HTML/CSS/JS 都在这一个文件里）
 ├── shitou.png      # 石头的头像
 ├── duoduo.png      # 多多的头像
@@ -33,7 +33,7 @@
 进入项目目录，启动一个本地 HTTP 服务器：
 
 ```bash
-cd "/Users/zhanghui/Documents/石头多多理财小助手"
+cd "/Users/zhanghui/zhanghuihub/家庭/石头多多理财小助手"
 python3 -m http.server 8080
 ```
 
@@ -46,9 +46,9 @@ python3 -m http.server 8080
 ### 首次部署
 
 ```bash
-cd "/Users/zhanghui/Documents/石头多多理财小助手"
+cd "/Users/zhanghui/zhanghuihub/家庭/石头多多理财小助手"
 git init
-git add index.html shitou.png duoduo.png
+git add index.html shitou.png duoduo.png README.md
 git commit -m "初始版本"
 git remote add origin https://github.com/hvpord/stone-duoduo-money.git
 # 在 GitHub 上创建 stone-duoduo-money 公开仓库后：
@@ -66,8 +66,8 @@ git push -u origin main
 每次修改后，执行：
 
 ```bash
-cd "/Users/zhanghui/Documents/石头多多理财小助手"
-git add index.html shitou.png duoduo.png
+cd "/Users/zhanghui/zhanghuihub/家庭/石头多多理财小助手"
+git add index.html shitou.png duoduo.png README.md
 git commit -m "更新说明"
 git push
 ```
