@@ -28,9 +28,9 @@
 
 > 本项目采用**单文件应用**架构，所有界面、样式、逻辑都写在 `index.html` 中，方便零基础维护和部署。
 
-## 本地预览
+## 本地预览（可选）
 
-进入项目目录，启动一个本地 HTTP 服务器：
+如果你想在推送前先在电脑上看效果，可以启动本地 HTTP 服务器：
 
 ```bash
 cd "/Users/zhanghui/zhanghuihub/家庭/石头多多理财小助手"
@@ -39,6 +39,8 @@ python3 -m http.server 8080
 
 然后在浏览器打开：http://localhost:8080
 
+> **更简单的方式**：直接修改后推送到 GitHub，然后访问 https://hvpord.github.io/stone-duoduo-money/ 查看在线效果。
+> 
 > 注意：直接双击打开 HTML 文件在手机上可能无法正常显示，必须通过 HTTP 服务器或部署到 GitHub Pages 访问。
 
 ## 部署到 GitHub Pages
