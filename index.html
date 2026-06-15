@@ -728,7 +728,7 @@
         <div class="quest-meta">备份到文件</div>
       </div>
     </div>
-    <div class="quest-card">
+    <div class="quest-card" onclick="resetData()">
       <div class="quest-icon challenge" style="font-size:18px;">🔄</div>
       <div class="quest-info">
         <div class="quest-title">重置数据</div>
@@ -1041,6 +1041,12 @@ function setBalance(childId, amount) {
 function adjustBalance(childId, delta) {
   const newBalance = Math.round((getBalance(childId) + delta) * 10) / 10;
   setBalance(childId, newBalance);
+}
+
+function resetData() {
+  if (!confirm('确定要清空所有数据吗？\n这会重置余额、任务领取和完成状态。')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
 }
 
 // ========== 页面切换 ==========
