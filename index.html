@@ -981,7 +981,7 @@
 // claimedBy: ['stone'] | ['duoduo'] | ['stone', 'duoduo'] - 已被谁领取
 // completedBy: ['stone'] | ['duoduo'] | ['stone', 'duoduo'] - 已被谁完成
 // rewardSplit: true - 平分奖励（both任务）
-const demoQuests = [
+let demoQuests = [
   { id: 1, type: 'task', title: '整理自己的书包', reward: 5, rewardUnit: 'big', assignee: 'stone', creator: 'parent', claimedBy: [], completedBy: [], icon: '🎒' },
   { id: 2, type: 'wish', title: '想买新乐高', reward: 500, rewardUnit: 'yuan', assignee: 'stone', creator: 'stone', claimedBy: [], completedBy: [], icon: '🧩', progress: 1505, target: 2000 },
   { id: 3, type: 'task', title: '帮妈妈拿快递', reward: 2.5, rewardUnit: 'small', assignee: 'duoduo', creator: 'stone', claimedBy: ['duoduo'], completedBy: [], icon: '📦' },
@@ -997,6 +997,51 @@ const unitNames = {
   small: { emoji: '🥈', name: '小奖贴', value: 2.5 },
   yuan: { emoji: '💰', name: '元', value: 1 }
 };
+
+// ========== 数据持久化（localStorage）==========
+const STORAGE_KEY = 'stoneDuoduoMoney';
+
+function loadData() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      console.warn('读取本地数据失败，使用默认数据');
+    }
+  }
+  return {
+    children: {
+      stone: { name: '石头', balance: 1505 },
+      duoduo: { name: '多多', balance: 257.5 }
+    },
+    quests: JSON.parse(JSON.stringify(demoQuests)),
+    transactions: []
+  };
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+}
+
+let appData = loadData();
+// 后续所有任务列表操作都指向持久化数据
+demoQuests = appData.quests;
+
+function getBalance(childId) {
+  return appData.children[childId]?.balance ?? 0;
+}
+
+function setBalance(childId, amount) {
+  appData.children[childId].balance = amount;
+  saveData();
+  renderBalance(childId, amount);
+}
+
+function adjustBalance(childId, delta) {
+  const newBalance = Math.round((getBalance(childId) + delta) * 10) / 10;
+  setBalance(childId, newBalance);
+}
 
 // ========== 页面切换 ==========
 function switchPage(page) {
@@ -1057,10 +1102,10 @@ function toggleTransferDirection() {
 
 // ========== 奖贴换算 ==========
 function convertToCurrency(amount) {
-  let remaining = amount;
-  const stars = Math.floor(remaining / 1000); remaining -= stars * 1000;
-  const supers = Math.floor(remaining / 50); remaining -= supers * 50;
-  const bigs = Math.floor(remaining / 5); remaining -= bigs * 5;
+  let remaining = Math.round(amount * 10) / 10;
+  const stars = Math.floor(remaining / 1000); remaining = Math.round((remaining - stars * 1000) * 10) / 10;
+  const supers = Math.floor(remaining / 50); remaining = Math.round((remaining - supers * 50) * 10) / 10;
+  const bigs = Math.floor(remaining / 5); remaining = Math.round((remaining - bigs * 5) * 10) / 10;
   const smalls = Math.floor(remaining / 2.5);
   return { stars, supers, bigs, smalls };
 }
@@ -1275,14 +1320,14 @@ function claimQuest(childId, questId, event) {
   if (!alreadyClaimed) {
     // 领取任务 - 头像变亮
     q.claimedBy.push(childId);
+    saveData();
     renderQuests('all');
     renderQuests2('all');
   } else {
     // 已领取，点击完成 - 发放奖励
     q.completedBy.push(childId);
     const reward = q.rewardSplit && q.assignee === 'both' ? q.reward / 2 : q.reward;
-    const currentBalance = childId === 'stone' ? 1505 : 257.5;
-    renderBalance(childId, currentBalance + reward);
+    adjustBalance(childId, reward);
     renderQuests('all');
     renderQuests2('all');
   }
@@ -1458,10 +1503,8 @@ function confirmIncome() {
   // 发放动画
   playIncomeAnimation(childId, stash.map(s => s.type));
 
-  // 更新余额（演示数据）
-  const currentBalance = childId === 'stone' ? 1505 : 257.5;
-  const newBalance = currentBalance + amount;
-  renderBalance(childId, newBalance);
+  // 更新余额
+  adjustBalance(childId, amount);
 
   alert(`✅ 已向 ${childId === 'stone' ? '石头' : '多多'} 发放奖励！\n${note}`);
 
@@ -1590,9 +1633,7 @@ function confirmExpense() {
   const note = document.getElementById('expense-note').value || '消费支出';
   const amount = expenseStash.reduce((sum, item) => sum + ({star:1000,super:50,big:5,small:2.5}[item.type]||0), 0);
   // 扣除余额
-  const currentBalance = childId === 'stone' ? 1505 : 257.5;
-  const newBalance = currentBalance - amount;
-  renderBalance(childId, newBalance);
+  adjustBalance(childId, -amount);
   alert(`💸 已记录支出！\n${note}`);
   clearExpenseStash();
   closeModal('modal-expense');
@@ -1677,10 +1718,8 @@ function confirmTransfer() {
   if (from === to) { alert('不能转给自己！'); return; }
   const amount = transferStash.reduce((sum, item) => sum + ({star:1000,super:50,big:5,small:2.5}[item.type]||0), 0);
   // 扣除转出方，增加转入方
-  const fromBalance = from === 'stone' ? 1505 : 257.5;
-  const toBalance = to === 'stone' ? 1505 : 257.5;
-  renderBalance(from, fromBalance - amount);
-  renderBalance(to, toBalance + amount);
+  adjustBalance(from, -amount);
+  adjustBalance(to, amount);
   // 转账动画：从一方飞到另一方
   playTransferAnimation(from, to, transferStash.map(s => s.type));
   alert(`🚀 转账成功！`);
@@ -1742,8 +1781,8 @@ document.head.appendChild(styleSheet);
 
 // ========== 初始化 ==========
 renderQuests('all');
-renderBalance('stone', 1505);
-renderBalance('duoduo', 257.5);
+renderBalance('stone', getBalance('stone'));
+renderBalance('duoduo', getBalance('duoduo'));
 </script>
 
 </body>
