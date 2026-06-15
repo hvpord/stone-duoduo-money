@@ -141,13 +141,16 @@
     }
 
     /* 奖贴展示 - 大大的图标 */
-    .currency-display {
+    .currency-display img {
+      max-width: 100%;
+      height: auto;
+    }
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 2px;
+      gap: 4px;
       margin-top: 8px;
-      min-height: 80px;
+      min-height: 180px;
       align-items: flex-end;
     }
     .currency-sticker {
@@ -481,7 +484,7 @@
     }
     .currency-picker {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
       margin-bottom: 14px;
     }
@@ -499,21 +502,21 @@
       background: #FFF8DC;
     }
     /* 全局奖贴尺寸 - 统一使用这些类 */
-    .sticker-star { font-size: 72px; }
-    .sticker-super { width: 48px; height: 48px; }
-    .sticker-big { width: 32px; height: 32px; }
-    .sticker-small { width: 18px; height: 18px; }
+    .sticker-star { font-size: 168px; }
+    .sticker-super { width: 96px; height: 96px; }
+    .sticker-big { width: 64px; height: 64px; }
+    .sticker-small { width: 36px; height: 36px; }
 
     /* 奖贴图片样式：按 PNG 原样显示 */
     .sticker-img {
       object-fit: contain;
     }
 
-    .currency-option .emoji { display: block; margin-bottom: 2px; transition: transform 0.15s; }
-    .currency-option .emoji.star-emoji { font-size: 84px; width: 84px; height: 84px; }
-    .currency-option .emoji.super-emoji { width: 48px; height: 48px; }
-    .currency-option .emoji.big-emoji { width: 32px; height: 32px; }
-    .currency-option .emoji.small-emoji { width: 18px; height: 18px; }
+    .currency-option .emoji { display: block; margin: 0 auto 2px; transition: transform 0.15s; object-fit: contain; max-width: 100%; }
+    .currency-option .emoji.star-emoji { width: 168px; height: auto; }
+    .currency-option .emoji.super-emoji { width: 96px; height: auto; }
+    .currency-option .emoji.big-emoji { width: 64px; height: auto; }
+    .currency-option .emoji.small-emoji { width: 36px; height: auto; }
     .currency-option:active .emoji { transform: scale(0.85); }
 
     /* 头像选择器 */
@@ -935,19 +938,19 @@
       <label class="form-label">奖励 / 目标金额</label>
       <div class="currency-picker">
         <div class="currency-option">
-          <img class="emoji" src="xingqiu.png" alt="星球" style="width:32px;height:32px;">
+          <img class="emoji" src="xingqiu.png" alt="星球" style="width:64px;height:64px;">
           <span class="name">星球</span>
         </div>
         <div class="currency-option">
-          <img class="emoji" src="chaodajiangtie.png" alt="超大贴" style="width:32px;height:32px;">
+          <img class="emoji" src="chaodajiangtie.png" alt="超大贴" style="width:64px;height:64px;">
           <span class="name">超大贴</span>
         </div>
         <div class="currency-option selected">
-          <img class="emoji" src="dajiangtie.png" alt="大奖贴" style="width:28px;height:28px;">
+          <img class="emoji" src="dajiangtie.png" alt="大奖贴" style="width:56px;height:56px;">
           <span class="name">大奖贴</span>
         </div>
         <div class="currency-option">
-          <img class="emoji" src="xiaojiangtie.png" alt="小奖贴" style="width:24px;height:24px;">
+          <img class="emoji" src="xiaojiangtie.png" alt="小奖贴" style="width:48px;height:48px;">
           <span class="name">小奖贴</span>
         </div>
       </div>
@@ -1108,10 +1111,10 @@ function convertToCurrency(amount) {
 
 // 奖贴配置：全部使用图片图标
 const stickerConfig = {
-  star: { emoji: null, img: 'xingqiu.png', size: 84, bg: 'star-bg', name: '星球' },
-  super: { emoji: null, img: 'chaodajiangtie.png', size: 48, bg: 'super-bg', name: '超大贴' },
-  big: { emoji: null, img: 'dajiangtie.png', size: 32, bg: 'big-bg', name: '大奖贴' },
-  small: { emoji: null, img: 'xiaojiangtie.png', size: 18, bg: 'small-bg', name: '小奖贴' }
+  star: { emoji: null, img: 'xingqiu.png', size: 168, bg: 'star-bg', name: '星球' },
+  super: { emoji: null, img: 'chaodajiangtie.png', size: 96, bg: 'super-bg', name: '超大贴' },
+  big: { emoji: null, img: 'dajiangtie.png', size: 64, bg: 'big-bg', name: '大奖贴' },
+  small: { emoji: null, img: 'xiaojiangtie.png', size: 36, bg: 'small-bg', name: '小奖贴' }
 };
 
 // 生成单个奖贴 HTML
@@ -1130,23 +1133,7 @@ function renderStickers(count, type) {
   if (count <= 0) return '';
   const cfg = stickerConfig[type];
   if (!cfg) return '';
-
   const single = getStickerHtml(type);
-
-  // 超大贴特殊处理：最多19个，超过10个分两行
-  if (type === 'super' && count > 10) {
-    const row1 = Array(10).fill(single).join('');
-    const row2Count = count - 10;
-    const row2 = Array(row2Count).fill(single).join('');
-    return `<div class="super-sticker-row">${row1}</div><div class="super-sticker-row second-row">${row2}</div>`;
-  }
-
-  // 其他奖贴：一行最多10个，超过显示+n
-  if (count > 10) {
-    const full = Array(10).fill(single).join('');
-    return full + `<span class="currency-sticker sticker-${type}" style="font-size:${cfg.size}px;">+${count - 10}</span>`;
-  }
-
   return Array(count).fill(single).join('');
 }
 
@@ -1291,7 +1278,7 @@ function formatReward(amount, unit, q) {
   const extra = displayAmount > 6 ? `+${Math.floor(displayAmount - 6)}` : '';
   let icons = '';
   for (let i = 0; i < count; i++) {
-    icons += getStickerHtml(unit, 22);
+    icons += getStickerHtml(unit, 44);
   }
   return `<span style="display:inline-flex;align-items:flex-end;gap:1px;white-space:nowrap;">${icons}<span style="font-size:13px;color:var(--text-light);">${extra}</span></span>`;
 }
