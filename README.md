@@ -23,6 +23,7 @@
 ├── index.html           # 主应用文件（所有 HTML/CSS/JS 都在这一个文件里）
 ├── shitou.png           # 石头的头像
 ├── duoduo.png           # 多多的头像
+├── xingqiu.png          # 星球图标
 ├── xiaojiangtie.png     # 小奖贴图标
 ├── dajiangtie.png       # 大奖贴图标
 ├── chaodajiangtie.png   # 超大贴图标

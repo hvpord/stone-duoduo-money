@@ -508,9 +508,10 @@
     .sticker-img.super-bg { background: #FFF0E6; }
     .sticker-img.big-bg { background: #FFE8F0; }
     .sticker-img.small-bg { background: #F3E8FF; }
+    .sticker-img.star-bg { background: #FFF8DC; }
 
     .currency-option .emoji { display: block; margin-bottom: 2px; transition: transform 0.15s; }
-    .currency-option .emoji.star-emoji { font-size: 72px; }
+    .currency-option .emoji.star-emoji { font-size: 84px; width: 84px; height: 84px; }
     .currency-option .emoji.super-emoji { width: 48px; height: 48px; }
     .currency-option .emoji.big-emoji { width: 32px; height: 32px; }
     .currency-option .emoji.small-emoji { width: 18px; height: 18px; }
@@ -782,7 +783,7 @@
       <label class="form-label">点击奖贴添加（再点移除）</label>
       <div class="currency-picker">
         <div class="currency-option" onclick="toggleStash('star', event)">
-          <span class="emoji star-emoji">🪐</span>
+          <img class="emoji star-emoji" src="xingqiu.png" alt="星球">
           <span class="name">星球</span>
           <span class="value">¥1000</span>
         </div>
@@ -842,7 +843,7 @@
       <label class="form-label">点击奖贴记录花费（再点移除）</label>
       <div class="currency-picker">
         <div class="currency-option" onclick="addExpense('star', event)">
-          <span class="emoji star-emoji">🪐</span>
+          <img class="emoji star-emoji" src="xingqiu.png" alt="星球">
           <span class="name">星球</span>
         </div>
         <div class="currency-option" onclick="addExpense('super', event)">
@@ -894,7 +895,7 @@
       <label class="form-label">点击奖贴添加转账金额（再点移除）</label>
       <div class="currency-picker">
         <div class="currency-option" onclick="addTransfer('star', event)">
-          <span class="emoji star-emoji">🪐</span>
+          <img class="emoji star-emoji" src="xingqiu.png" alt="星球">
           <span class="name">星球</span>
         </div>
         <div class="currency-option" onclick="addTransfer('super', event)">
@@ -944,7 +945,7 @@
       <label class="form-label">奖励 / 目标金额</label>
       <div class="currency-picker">
         <div class="currency-option">
-          <span class="emoji">🪐</span>
+          <img class="emoji" src="xingqiu.png" alt="星球" style="width:32px;height:32px;">
           <span class="name">星球</span>
         </div>
         <div class="currency-option">
@@ -1064,9 +1065,9 @@ function convertToCurrency(amount) {
   return { stars, supers, bigs, smalls };
 }
 
-// 奖贴配置：星球用 emoji，其他用图片
+// 奖贴配置：全部使用图片图标
 const stickerConfig = {
-  star: { emoji: '🪐', img: null, size: 72, bg: '', name: '星球' },
+  star: { emoji: null, img: 'xingqiu.png', size: 84, bg: 'star-bg', name: '星球' },
   super: { emoji: null, img: 'chaodajiangtie.png', size: 48, bg: 'super-bg', name: '超大贴' },
   big: { emoji: null, img: 'dajiangtie.png', size: 32, bg: 'big-bg', name: '大奖贴' },
   small: { emoji: null, img: 'xiaojiangtie.png', size: 18, bg: 'small-bg', name: '小奖贴' }
