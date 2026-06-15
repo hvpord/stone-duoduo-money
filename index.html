@@ -605,11 +605,11 @@
 </head>
 <body>
 
-<!-- ========== 首页 ========== -->
+<!-- ========== 钱包页 ========== -->
 <div class="page active" id="page-home">
   <div class="header">
-    <h1>🌟 石头多多理财小助手</h1>
-    <div class="subtitle">勇敢探险，智慧理财！</div>
+    <h1>💰 钱包</h1>
+    <div class="subtitle">看看石头和多多有多少资产</div>
   </div>
 
   <div class="children-grid">
@@ -653,26 +653,12 @@
       <span>新任务</span>
     </button>
   </div>
-
-  <div class="section-header">
-    <div class="section-title">🚀 探险列表</div>
-    <span style="font-size:13px;color:var(--text-light);">待完成 3</span>
-  </div>
-  <div class="filter-tabs">
-    <button class="filter-tab active" onclick="filterQuests('all')">全部</button>
-    <button class="filter-tab" onclick="filterQuests('task')">🎯 任务</button>
-    <button class="filter-tab" onclick="filterQuests('wish')">⭐ 心愿</button>
-    <button class="filter-tab" onclick="filterQuests('challenge')">🏆 挑战</button>
-  </div>
-  <div class="quest-list" id="quest-list">
-    <!-- 动态生成 -->
-  </div>
 </div>
 
-<!-- ========== 探险页 ========== -->
+<!-- ========== 任务页 ========== -->
 <div class="page" id="page-quests">
   <div class="header">
-    <h1>🚀 探险广场</h1>
+    <h1>🎯 任务中心</h1>
     <div class="subtitle">完成任务，赚取奖励贴！</div>
   </div>
   <div class="filter-tabs">
@@ -745,12 +731,12 @@
 <!-- ========== 底部导航 ========== -->
 <div class="bottom-nav">
   <button class="nav-item active" onclick="switchPage('home')">
-    <span class="icon">🏠</span>
-    <span>首页</span>
+    <span class="icon">💰</span>
+    <span>钱包</span>
   </button>
   <button class="nav-item" onclick="switchPage('quests')">
-    <span class="icon">🚀</span>
-    <span>探险</span>
+    <span class="icon">🎯</span>
+    <span>任务</span>
   </button>
   <button class="nav-item" onclick="switchPage('ledger')">
     <span class="icon">📒</span>
@@ -1645,7 +1631,6 @@ styleSheet.textContent = `
 document.head.appendChild(styleSheet);
 
 // ========== 初始化 ==========
-renderQuests('all');
 renderBalance('stone', getBalance('stone'));
 renderBalance('duoduo', getBalance('duoduo'));
 </script>
