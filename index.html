@@ -763,7 +763,7 @@
   <div class="modal-sheet">
     <div class="modal-header">
       <div class="modal-title">💰 发奖励</div>
-      <button class="modal-close" onclick="closeModal('modal-income'); clearStash();">✕</button>
+      <button class="modal-close" onclick="closeModal('modal-income')">✕</button>
     </div>
     <div class="form-group">
       <label class="form-label">给谁</label>
@@ -780,41 +780,30 @@
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">点击奖贴添加（再点移除）</label>
+      <label class="form-label">点击奖贴直接发放</label>
       <div class="currency-picker">
-        <div class="currency-option" onclick="toggleStash('star', event)">
+        <div class="currency-option" onclick="giveReward('star', event)">
           <img class="emoji star-emoji" src="xingqiu.png" alt="星球">
           <span class="name">星球</span>
           <span class="value">¥1000</span>
         </div>
-        <div class="currency-option" onclick="toggleStash('super', event)">
+        <div class="currency-option" onclick="giveReward('super', event)">
           <img class="emoji super-emoji" src="chaodajiangtie.png" alt="超大贴">
           <span class="name">超大贴</span>
           <span class="value">¥50</span>
         </div>
-        <div class="currency-option" onclick="toggleStash('big', event)">
+        <div class="currency-option" onclick="giveReward('big', event)">
           <img class="emoji big-emoji" src="dajiangtie.png" alt="大奖贴">
           <span class="name">大奖贴</span>
           <span class="value">¥5</span>
         </div>
-        <div class="currency-option" onclick="toggleStash('small', event)">
+        <div class="currency-option" onclick="giveReward('small', event)">
           <img class="emoji small-emoji" src="xiaojiangtie.png" alt="小奖贴">
           <span class="name">小奖贴</span>
           <span class="value">¥2.5</span>
         </div>
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">暂存区 📦</label>
-      <div id="stash-area" style="background:#FFF9F0;border:2px dashed #FFD93D;border-radius:16px;padding:12px;min-height:90px;display:flex;flex-wrap:wrap;gap:2px;align-items:flex-end;justify-content:center;">
-        <span style="color:var(--text-light);font-size:13px;width:100%;text-align:center;" id="stash-empty">点击上方奖贴添加...</span>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">备注</label>
-      <input class="form-input" id="income-note" placeholder="为什么发奖励？">
-    </div>
-    <button class="btn-primary" onclick="confirmIncome()">✨ 确认发放</button>
   </div>
 </div>
 
@@ -1388,20 +1377,26 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
   });
 });
 
-// ========== 暂存区（发奖励用） ==========
-let stash = [];
+// ========== 发奖励（点击直接发放） ==========
+function getStickerBgColor(type) {
+  const colors = { star: '#FFF8DC', super: '#FFF0E6', big: '#FFE8F0', small: '#F3E8FF' };
+  return colors[type] || '#FFF';
+}
 
-function toggleStash(type, event) {
+function giveReward(type, event) {
   const cfg = stickerConfig[type];
   if (!cfg) return;
+  const values = { star: 1000, super: 50, big: 5, small: 2.5 };
+  const childId = document.getElementById('income-child').value;
 
-  // 飞入动画：从点击位置飞到暂存区
+  const card = document.querySelector(`.child-card.${childId}`);
+  if (!card) return;
+
   const startX = event.clientX;
   const startY = event.clientY;
-  const area = document.getElementById('stash-area');
-  const areaRect = area.getBoundingClientRect();
-  const endX = areaRect.left + areaRect.width / 2 + (stash.length * 30 - 60);
-  const endY = areaRect.top + areaRect.height / 2;
+  const cardRect = card.getBoundingClientRect();
+  const endX = cardRect.left + cardRect.width / 2;
+  const endY = cardRect.top + cardRect.height / 2;
 
   const flyer = document.createElement('div');
   flyer.style.cssText = `
@@ -1410,11 +1405,10 @@ function toggleStash(type, event) {
     top: ${startY}px;
     z-index: 9999;
     pointer-events: none;
-    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   `;
-
   if (cfg.img) {
-    flyer.innerHTML = `<img src="${cfg.img}" style="width:${cfg.size}px;height:${cfg.size}px;border-radius:6px;background:${getStickerBgColor(type)};padding:2px;">`;
+    flyer.innerHTML = `<img src="${cfg.img}" style="width:${cfg.size}px;height:${cfg.size}px;border-radius:8px;background:${getStickerBgColor(type)};padding:2px;">`;
   } else {
     flyer.textContent = cfg.emoji;
     flyer.style.fontSize = cfg.size + 'px';
@@ -1424,141 +1418,13 @@ function toggleStash(type, event) {
   requestAnimationFrame(() => {
     flyer.style.left = endX + 'px';
     flyer.style.top = endY + 'px';
-    flyer.style.transform = 'scale(0.8)';
+    flyer.style.transform = 'scale(0.3)';
+    flyer.style.opacity = '0';
   });
 
-  setTimeout(() => {
-    flyer.remove();
-    stash.push({ type });
-    renderStash();
-  }, 500);
-}
+  setTimeout(() => flyer.remove(), 800);
 
-function getStickerBgColor(type) {
-  const colors = { star: '#FFF8DC', super: '#FFF0E6', big: '#FFE8F0', small: '#F3E8FF' };
-  return colors[type] || '#FFF';
-}
-
-function getEmojiSize(type) {
-  return stickerConfig[type] ? stickerConfig[type].size : 18;
-}
-
-function renderStash() {
-  const area = document.getElementById('stash-area');
-
-  // 清空并重新渲染
-  area.innerHTML = '';
-  if (stash.length === 0) {
-    area.innerHTML = '<span style="color:var(--text-light);font-size:13px;width:100%;text-align:center;" id="stash-empty">点击上方奖贴添加...</span>';
-    return;
-  }
-
-  stash.forEach((item, index) => {
-    const wrapper = document.createElement('span');
-    wrapper.innerHTML = getStickerHtml(item.type);
-    const sticker = wrapper.firstChild;
-    sticker.style.cursor = 'pointer';
-    sticker.style.transition = 'all 0.2s';
-    sticker.style.animation = 'popIn 0.4s ease';
-    sticker.style.display = 'inline-flex';
-    sticker.style.alignItems = 'flex-end';
-    sticker.title = '点击移除';
-    sticker.onclick = () => removeFromStash(index);
-    area.appendChild(sticker);
-  });
-
-  // 添加清空按钮
-  const clearBtn = document.createElement('span');
-  clearBtn.textContent = '❌';
-  clearBtn.style.fontSize = '14px';
-  clearBtn.style.cursor = 'pointer';
-  clearBtn.style.marginLeft = '8px';
-  clearBtn.style.alignSelf = 'center';
-  clearBtn.title = '清空';
-  clearBtn.onclick = clearStash;
-  area.appendChild(clearBtn);
-}
-
-function removeFromStash(index) {
-  stash.splice(index, 1);
-  renderStash();
-}
-
-function clearStash() {
-  stash = [];
-  renderStash();
-}
-
-// 计算暂存区总金额
-function calcStashAmount() {
-  const values = { star: 1000, super: 50, big: 5, small: 2.5 };
-  return stash.reduce((sum, item) => sum + (values[item.type] || 0), 0);
-}
-
-// ========== 确认发放奖励 ==========
-function confirmIncome() {
-  if (stash.length === 0) {
-    alert('请先点击奖贴添加到暂存区！');
-    return;
-  }
-
-  const childId = document.getElementById('income-child').value;
-  const note = document.getElementById('income-note').value || '发放奖励';
-  const amount = calcStashAmount();
-
-  // 发放动画
-  playIncomeAnimation(childId, stash.map(s => s.type));
-
-  // 更新余额
-  adjustBalance(childId, amount);
-
-  alert(`✅ 已向 ${childId === 'stone' ? '石头' : '多多'} 发放奖励！\n${note}`);
-
-  clearStash();
-  closeModal('modal-income');
-}
-
-// ========== 奖贴飞入钱包动画 ==========
-function playIncomeAnimation(childId, types) {
-  const card = document.querySelector(`.child-card.${childId}`);
-  if (!card) return;
-
-  const cardRect = card.getBoundingClientRect();
-  const startX = window.innerWidth / 2;
-  const startY = window.innerHeight / 2;
-  const endX = cardRect.left + cardRect.width / 2;
-  const endY = cardRect.top + cardRect.height / 2;
-
-  types.forEach((type, i) => {
-    setTimeout(() => {
-      const cfg = stickerConfig[type];
-      const el = document.createElement('div');
-      el.style.cssText = `
-        position: fixed;
-        left: ${startX}px;
-        top: ${startY}px;
-        z-index: 9999;
-        pointer-events: none;
-        transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      `;
-      if (cfg.img) {
-        el.innerHTML = `<img src="${cfg.img}" style="width:40px;height:40px;border-radius:6px;background:${getStickerBgColor(type)};padding:2px;">`;
-      } else {
-        el.textContent = cfg.emoji;
-        el.style.fontSize = '40px';
-      }
-      document.body.appendChild(el);
-
-      requestAnimationFrame(() => {
-        el.style.left = endX + 'px';
-        el.style.top = endY + 'px';
-        el.style.transform = 'scale(0.3)';
-        el.style.opacity = '0';
-      });
-
-      setTimeout(() => el.remove(), 1200);
-    }, i * 200);
-  });
+  adjustBalance(childId, values[type]);
 }
 
 // ========== 支出暂存区 ==========
