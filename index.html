@@ -6,18 +6,18 @@
   <title>石头多多理财小助手</title>
   <style>
     :root {
-      --stone-color: #5BA4E6;
-      --stone-light: #E8F4FD;
-      --duoduo-color: #7ED67E;
-      --duoduo-light: #E8F8E8;
-      --star-color: #FFD93D;
-      --super-color: #FF8C42;
-      --big-color: #FF6B9D;
-      --small-color: #C084FC;
-      --bg-color: #FFF9F0;
+      --stone-color: #696FC7;
+      --stone-light: #A7AAE1;
+      --duoduo-color: #F2AEBB;
+      --duoduo-light: #F5D3C4;
+      --star-color: #F2AEBB;
+      --super-color: #A7AAE1;
+      --big-color: #F2AEBB;
+      --small-color: #696FC7;
+      --bg-color: #F5D3C4;
       --card-bg: #FFFFFF;
-      --text-main: #4A4A68;
-      --text-light: #8A8AA3;
+      --text-main: #696FC7;
+      --text-light: #A7AAE1;
     }
 
     * {
@@ -28,7 +28,7 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", sans-serif;
+      font-family: "Comic Sans MS", "Chalkboard SE", "Hannotate SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       background: var(--bg-color);
       color: var(--text-main);
       min-height: 100vh;
@@ -119,8 +119,16 @@
     .child-name {
       font-size: 16px;
       font-weight: 700;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
+    .child-total {
+      font-family: "Comic Sans MS", "Chalkboard SE", "Hannotate SC", "PingFang SC", sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .stone .child-total { color: var(--stone-color); }
+    .duoduo .child-total { color: var(--duoduo-color); }
     .child-balance {
       font-size: 13px;
       color: var(--text-light);
@@ -496,19 +504,10 @@
     .sticker-big { width: 32px; height: 32px; }
     .sticker-small { width: 18px; height: 18px; }
 
-    /* 奖贴图片样式：圆角方框 + 背景色 */
+    /* 奖贴图片样式：按 PNG 原样显示 */
     .sticker-img {
       object-fit: contain;
-      border-radius: 8px;
-      padding: 2px;
-      background: #FFF;
-      border: 1px solid rgba(0,0,0,0.08);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
-    .sticker-img.super-bg { background: #FFF0E6; }
-    .sticker-img.big-bg { background: #FFE8F0; }
-    .sticker-img.small-bg { background: #F3E8FF; }
-    .sticker-img.star-bg { background: #FFF8DC; }
 
     .currency-option .emoji { display: block; margin-bottom: 2px; transition: transform 0.15s; }
     .currency-option .emoji.star-emoji { font-size: 84px; width: 84px; height: 84px; }
@@ -616,6 +615,7 @@
         <img src="shitou.png" alt="石头">
       </div>
       <div class="child-name">石头</div>
+      <div class="child-total" id="stone-total">¥0</div>
       <div class="child-balance">
         <div class="currency-display" id="stone-balance"></div>
       </div>
@@ -625,6 +625,7 @@
         <img src="duoduo.png" alt="多多">
       </div>
       <div class="child-name">多多</div>
+      <div class="child-total" id="duoduo-total">¥0</div>
       <div class="child-balance">
         <div class="currency-display" id="duoduo-balance"></div>
       </div>
@@ -1162,6 +1163,11 @@ function formatCurrency(amount) {
 function renderBalance(childId, amount) {
   const el = document.getElementById(childId + '-balance');
   if (el) el.innerHTML = formatCurrency(amount);
+  const totalEl = document.getElementById(childId + '-total');
+  if (totalEl) {
+    const value = Math.round(amount * 10) / 10;
+    totalEl.textContent = '¥' + (value % 1 === 0 ? value : value.toFixed(1));
+  }
 }
 
 // ========== 渲染探险列表 ==========
@@ -1408,7 +1414,7 @@ function giveReward(type, event) {
     transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   `;
   if (cfg.img) {
-    flyer.innerHTML = `<img src="${cfg.img}" style="width:${cfg.size}px;height:${cfg.size}px;border-radius:8px;background:${getStickerBgColor(type)};padding:2px;">`;
+    flyer.innerHTML = `<img src="${cfg.img}" style="width:${cfg.size}px;height:${cfg.size}px;">`;
   } else {
     flyer.textContent = cfg.emoji;
     flyer.style.fontSize = cfg.size + 'px';
@@ -1450,7 +1456,7 @@ function addExpense(type, event) {
     transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   `;
   if (cfg.img) {
-    flyer.innerHTML = `<img src="${cfg.img}" style="width:${cfg.size}px;height:${cfg.size}px;border-radius:6px;background:${getStickerBgColor(type)};padding:2px;">`;
+    flyer.innerHTML = `<img src="${cfg.img}" style="width:${cfg.size}px;height:${cfg.size}px;">`;
   } else {
     flyer.textContent = cfg.emoji;
     flyer.style.fontSize = cfg.size + 'px';
@@ -1534,7 +1540,7 @@ function addTransfer(type, event) {
     transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   `;
   if (cfg.img) {
-    flyer.innerHTML = `<img src="${cfg.img}" style="width:${cfg.size}px;height:${cfg.size}px;border-radius:6px;background:${getStickerBgColor(type)};padding:2px;">`;
+    flyer.innerHTML = `<img src="${cfg.img}" style="width:${cfg.size}px;height:${cfg.size}px;">`;
   } else {
     flyer.textContent = cfg.emoji;
     flyer.style.fontSize = cfg.size + 'px';
@@ -1623,7 +1629,7 @@ function playTransferAnimation(fromId, toId, types) {
         transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       `;
       if (cfg.img) {
-        el.innerHTML = `<img src="${cfg.img}" style="width:40px;height:40px;border-radius:6px;background:${getStickerBgColor(type)};padding:2px;">`;
+        el.innerHTML = `<img src="${cfg.img}" style="width:40px;height:40px;">`;
       } else {
         el.textContent = cfg.emoji;
         el.style.fontSize = '40px';
