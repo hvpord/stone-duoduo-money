@@ -52,7 +52,18 @@
     .header {
       text-align: center;
       padding: 20px 16px 10px;
+      position: relative;
     }
+    .new-task-icon {
+      position: absolute;
+      right: 16px;
+      top: 20px;
+      font-size: 28px;
+      cursor: pointer;
+      transition: transform 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .new-task-icon:active { transform: scale(0.85); }
     .header h1 {
       font-size: 22px;
       color: var(--text-main);
@@ -69,31 +80,22 @@
 
     /* 孩子卡片区域 */
     .children-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
+      flex-direction: column;
       gap: 12px;
       padding: 0 16px;
       margin-bottom: 20px;
     }
     .child-card {
-      background: var(--card-bg);
-      border-radius: 20px;
-      padding: 16px 12px;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+      background: transparent;
+      border-radius: 0;
+      padding: 0;
+      text-align: left;
+      box-shadow: none;
       position: relative;
-      overflow: hidden;
+      overflow: visible;
     }
-    .child-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-    }
-    .child-card.stone::before { background: var(--stone-color); }
-    .child-card.duoduo::before { background: var(--duoduo-color); }
+    .child-card::before { display: none; }
 
     .child-avatar img, .avatar-option img, .quest-avatar img, .transfer-avatar img {
       width: 100%;
@@ -102,37 +104,69 @@
       border-radius: 50%;
     }
     .child-avatar {
-      width: 56px;
-      height: 56px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
-      margin: 0 auto 8px;
+      margin: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 28px;
       background: var(--stone-light);
       overflow: hidden;
+      flex-shrink: 0;
     }
     .child-card.duoduo .child-avatar {
       background: var(--duoduo-light);
     }
+    .child-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+    .child-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-top: 4px;
+    }
     .child-name {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 2px;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 0;
     }
     .child-total {
       font-family: "Comic Sans MS", "Chalkboard SE", "Hannotate SC", "PingFang SC", sans-serif;
-      font-size: 20px;
+      font-size: 28px;
       font-weight: 800;
-      margin-bottom: 6px;
+      margin-bottom: 0;
     }
-    .stone .child-total { color: var(--stone-color); }
-    .duoduo .child-total { color: var(--duoduo-color); }
+    .stone .child-name, .stone .child-total { color: var(--stone-color); }
+    .duoduo .child-name, .duoduo .child-total { color: var(--duoduo-color); }
+    .child-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 4px;
+    }
+    .action-icon {
+      font-size: 30px;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.15s;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .action-icon:active { transform: scale(0.85); }
+    .action-icon.income { color: #4CAF50; }
+    .action-icon.expense { color: #E74C3C; }
+    .action-icon.transfer { color: var(--text-main); }
     .child-balance {
       font-size: 13px;
       color: var(--text-light);
-      line-height: 1.5;
+      line-height: 1.2;
     }
     .child-balance .amount {
       font-size: 20px;
@@ -141,17 +175,18 @@
     }
 
     /* 奖贴展示 - 大大的图标 */
+    .currency-display {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      gap: 1px;
+      margin-top: 2px;
+      min-height: auto;
+      align-items: flex-end;
+    }
     .currency-display img {
       max-width: 100%;
       height: auto;
-    }
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 4px;
-      margin-top: 8px;
-      min-height: 180px;
-      align-items: flex-end;
     }
     .currency-sticker {
       line-height: 1;
@@ -618,48 +653,49 @@
   <div class="header">
     <h1>💰 钱包</h1>
     <div class="subtitle">看看石头和多多有多少资产</div>
+    <span class="new-task-icon" onclick="openModal('modal-quest')">✨</span>
   </div>
 
   <div class="children-grid">
-    <div class="child-card stone" onclick="showChildDetail('stone')">
-      <div class="child-avatar">
-        <img src="shitou.png" alt="石头">
+    <div class="child-card stone">
+      <div class="child-header">
+        <div class="child-avatar">
+          <img src="shitou.png" alt="石头">
+        </div>
+        <div class="child-info">
+          <div class="child-name">石头</div>
+          <div class="child-total" id="stone-total">¥0</div>
+          <div class="child-actions">
+            <span class="action-icon income" onclick="openIncomeFor('stone', event)">➕</span>
+            <span class="action-icon expense" onclick="openExpenseFor('stone', event)">➖</span>
+            <span class="action-icon transfer" onclick="openTransferFrom('stone', event)">↔️</span>
+          </div>
+        </div>
       </div>
-      <div class="child-name">石头</div>
-      <div class="child-total" id="stone-total">¥0</div>
-      <div class="child-balance">
+      <div class="child-balance" onclick="showChildDetail('stone')">
         <div class="currency-display" id="stone-balance"></div>
       </div>
     </div>
-    <div class="child-card duoduo" onclick="showChildDetail('duoduo')">
-      <div class="child-avatar">
-        <img src="duoduo.png" alt="多多">
+
+    <div class="child-card duoduo">
+      <div class="child-header">
+        <div class="child-avatar">
+          <img src="duoduo.png" alt="多多">
+        </div>
+        <div class="child-info">
+          <div class="child-name">多多</div>
+          <div class="child-total" id="duoduo-total">¥0</div>
+          <div class="child-actions">
+            <span class="action-icon income" onclick="openIncomeFor('duoduo', event)">➕</span>
+            <span class="action-icon expense" onclick="openExpenseFor('duoduo', event)">➖</span>
+            <span class="action-icon transfer" onclick="openTransferFrom('duoduo', event)">↔️</span>
+          </div>
+        </div>
       </div>
-      <div class="child-name">多多</div>
-      <div class="child-total" id="duoduo-total">¥0</div>
-      <div class="child-balance">
+      <div class="child-balance" onclick="showChildDetail('duoduo')">
         <div class="currency-display" id="duoduo-balance"></div>
       </div>
     </div>
-  </div>
-
-  <div class="quick-actions">
-    <button class="action-btn" onclick="openModal('modal-income')">
-      <span class="icon">💰</span>
-      <span>发奖励</span>
-    </button>
-    <button class="action-btn" onclick="openModal('modal-expense')">
-      <span class="icon">🛒</span>
-      <span>记支出</span>
-    </button>
-    <button class="action-btn" onclick="openModal('modal-transfer')">
-      <span class="icon">🔄</span>
-      <span>转账</span>
-    </button>
-    <button class="action-btn" onclick="openModal('modal-quest')">
-      <span class="icon">✨</span>
-      <span>新任务</span>
-    </button>
   </div>
 </div>
 
@@ -1088,6 +1124,30 @@ function toggleTransferDirection() {
 
   // 箭头翻转动画
   arrow.style.transform = transferDirectionReversed ? 'scaleX(-1)' : 'scaleX(1)';
+}
+
+// 钱包页快捷操作：打开发奖励并选中指定孩子
+function openIncomeFor(childId, event) {
+  event.stopPropagation();
+  selectChild('income', childId);
+  openModal('modal-income');
+}
+
+// 钱包页快捷操作：打开记支出并选中指定孩子
+function openExpenseFor(childId, event) {
+  event.stopPropagation();
+  selectChild('expense', childId);
+  openModal('modal-expense');
+}
+
+// 钱包页快捷操作：打开转账并设置为从指定孩子转出
+function openTransferFrom(childId, event) {
+  event.stopPropagation();
+  const desiredReversed = childId === 'duoduo';
+  if (transferDirectionReversed !== desiredReversed) {
+    toggleTransferDirection();
+  }
+  openModal('modal-transfer');
 }
 
 // ========== 奖贴换算 ==========
