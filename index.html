@@ -723,11 +723,50 @@
 
     /* 合计金额 */
     .staging-total {
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       font-size: 15px;
       font-weight: 700;
       color: var(--text-light);
+      margin-bottom: 4px;
+    }
+    .note-icon {
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.12));
+      text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+    }
+    .note-icon:active {
+      transform: scale(0.85);
+    }
+    .note-icon.has-note {
+      filter: drop-shadow(0 0 5px #FFD93D);
+    }
+
+    /* 笔记输入 */
+    .note-input-wrap {
       margin-bottom: 8px;
+      padding: 0 16px;
+      display: none;
+    }
+    .note-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 12px;
+      background: #FFFDF5;
+      font-size: 14px;
+      color: var(--text-main);
+      outline: none;
+      -webkit-appearance: none;
+    }
+    .note-input::placeholder {
+      color: var(--text-light);
     }
 
     /* 底部奖贴选择器 - 无背景框，无横线 */
@@ -947,7 +986,13 @@
     <div class="currency-staging-area" id="income-stash-area" onclick="handleStashClick('income', event)">
       <span class="staging-hint" id="income-stash-hint">点击下面奖贴添加...</span>
     </div>
-    <div class="staging-total" id="income-total">合计：¥0</div>
+    <div class="staging-total" id="income-total">
+      <span id="income-total-amount">合计：¥0</span>
+      <span class="note-icon" id="income-note-icon" onclick="toggleNoteInput('income')">📝</span>
+    </div>
+    <div class="note-input-wrap" id="income-note-wrap">
+      <input class="note-input" id="income-note-input" placeholder="记录发奖原因..." oninput="updateNote('income', this.value)">
+    </div>
     <div class="currency-picker-simple">
       <div class="currency-item" onclick="addToStash('income', 'star', event)">
         <img src="xingqiu.png" alt="星球" style="width:84px;height:84px;">
@@ -975,7 +1020,13 @@
     <div class="currency-staging-area" id="expense-stash-area" onclick="handleStashClick('expense', event)">
       <span class="staging-hint" id="expense-stash-hint">点击下面奖贴添加...</span>
     </div>
-    <div class="staging-total" id="expense-total">合计：¥0</div>
+    <div class="staging-total" id="expense-total">
+      <span id="expense-total-amount">合计：¥0</span>
+      <span class="note-icon" id="expense-note-icon" onclick="toggleNoteInput('expense')">📝</span>
+    </div>
+    <div class="note-input-wrap" id="expense-note-wrap">
+      <input class="note-input" id="expense-note-input" placeholder="记录扣奖原因..." oninput="updateNote('expense', this.value)">
+    </div>
     <div class="currency-picker-simple">
       <div class="currency-item" onclick="addToStash('expense', 'star', event)">
         <img src="xingqiu.png" alt="星球" style="width:84px;height:84px;">
@@ -1008,7 +1059,13 @@
     <div class="currency-staging-area" id="transfer-stash-area" onclick="handleStashClick('transfer', event)">
       <span class="staging-hint" id="transfer-stash-hint">点击下面奖贴添加...</span>
     </div>
-    <div class="staging-total" id="transfer-total">合计：¥0</div>
+    <div class="staging-total" id="transfer-total">
+      <span id="transfer-total-amount">合计：¥0</span>
+      <span class="note-icon" id="transfer-note-icon" onclick="toggleNoteInput('transfer')">📝</span>
+    </div>
+    <div class="note-input-wrap" id="transfer-note-wrap">
+      <input class="note-input" id="transfer-note-input" placeholder="记录交换原因..." oninput="updateNote('transfer', this.value)">
+    </div>
     <div class="currency-picker-simple">
       <div class="currency-item" onclick="addToStash('transfer', 'star', event)">
         <img src="xingqiu.png" alt="星球" style="width:84px;height:84px;">
@@ -1190,15 +1247,55 @@ const currencyStashes = {
 };
 
 const currencyContexts = {
-  income: { childId: 'stone' },
-  expense: { childId: 'stone' },
-  transfer: { from: 'stone', to: 'duoduo', reversed: false }
+  income: { childId: 'stone', note: '' },
+  expense: { childId: 'stone', note: '' },
+  transfer: { from: 'stone', to: 'duoduo', reversed: false, note: '' }
 };
 
 function closeCurrencyModal(mode) {
   closeModal('modal-' + mode);
   currencyStashes[mode] = [];
+  currencyContexts[mode].note = '';
+  hideNoteInput(mode);
   renderStash(mode);
+}
+
+function hideNoteInput(mode) {
+  const wrap = document.getElementById(mode + '-note-wrap');
+  const input = document.getElementById(mode + '-note-input');
+  if (wrap) wrap.style.display = 'none';
+  if (input) input.value = '';
+}
+
+function toggleNoteInput(mode) {
+  const wrap = document.getElementById(mode + '-note-wrap');
+  const input = document.getElementById(mode + '-note-input');
+  if (!wrap) return;
+  if (wrap.style.display === 'block') {
+    wrap.style.display = 'none';
+  } else {
+    wrap.style.display = 'block';
+    if (input) {
+      input.value = currencyContexts[mode].note || '';
+      input.focus();
+    }
+  }
+}
+
+function updateNote(mode, value) {
+  currencyContexts[mode].note = value.trim();
+  updateNoteIcon(mode);
+}
+
+function updateNoteIcon(mode) {
+  const icon = document.getElementById(mode + '-note-icon');
+  if (icon) {
+    if (currencyContexts[mode].note) {
+      icon.classList.add('has-note');
+    } else {
+      icon.classList.remove('has-note');
+    }
+  }
 }
 
 function setModalTitleAvatar(mode, childId) {
@@ -1210,8 +1307,10 @@ function setModalTitleAvatar(mode, childId) {
 function openIncomeFor(childId, event) {
   event.stopPropagation();
   currencyContexts.income.childId = childId;
+  currencyContexts.income.note = '';
   currencyStashes.income = [];
   setModalTitleAvatar('income', childId);
+  hideNoteInput('income');
   renderStash('income');
   openModal('modal-income');
 }
@@ -1220,8 +1319,10 @@ function openIncomeFor(childId, event) {
 function openExpenseFor(childId, event) {
   event.stopPropagation();
   currencyContexts.expense.childId = childId;
+  currencyContexts.expense.note = '';
   currencyStashes.expense = [];
   setModalTitleAvatar('expense', childId);
+  hideNoteInput('expense');
   renderStash('expense');
   openModal('modal-expense');
 }
@@ -1251,7 +1352,9 @@ function openTransferFrom(childId, event) {
   if (transferDirectionReversed !== desiredReversed) {
     toggleTransferDirection();
   }
+  currencyContexts.transfer.note = '';
   currencyStashes.transfer = [];
+  hideNoteInput('transfer');
   renderStash('transfer');
   openModal('modal-transfer');
 }
@@ -1604,7 +1707,7 @@ function createStashHint(mode) {
 
 function renderStash(mode) {
   const area = document.getElementById(mode + '-stash-area');
-  const totalEl = document.getElementById(mode + '-total');
+  const totalAmountEl = document.getElementById(mode + '-total-amount');
   if (!area) return;
 
   area.innerHTML = '';
@@ -1638,7 +1741,8 @@ function renderStash(mode) {
     cancelBtn.onclick = (e) => { e.stopPropagation(); currencyStashes[mode] = []; renderStash(mode); };
     area.appendChild(cancelBtn);
   }
-  if (totalEl) totalEl.textContent = '合计：' + formatAmount(getStashAmount(mode));
+  if (totalAmountEl) totalAmountEl.textContent = '合计：' + formatAmount(getStashAmount(mode));
+  updateNoteIcon(mode);
 }
 
 function runConfirm(mode) {
@@ -1862,11 +1966,12 @@ function confirmIncome() {
   closeCurrencyModal('income');
   playFlyToWallet(childId, stash.map(s => s.type), sourceRects, () => {
     adjustBalance(childId, amount);
+    const customNote = currencyContexts.income.note;
     addTransaction({
       type: 'income',
       childId,
       amount,
-      note: '获得奖励'
+      note: customNote || '获得奖励'
     });
     const merges = computeMerges(oldCounts, stashCounts);
     if (merges.length > 0) playMergeAnimation(childId, merges);
@@ -1890,11 +1995,12 @@ function confirmExpense() {
   closeCurrencyModal('expense');
   playFlyToWallet(childId, stash.map(s => s.type), sourceRects, () => {
     adjustBalance(childId, -amount);
+    const customNote = currencyContexts.expense.note;
     addTransaction({
       type: 'expense',
       childId,
       amount,
-      note: '消费支出'
+      note: customNote || '消费支出'
     });
   });
 }
@@ -1920,12 +2026,14 @@ function confirmTransfer() {
   playFlyToWallet(to, stash.map(s => s.type), sourceRects, () => {
     adjustBalance(from, -amount);
     adjustBalance(to, amount);
+    const customNote = currencyContexts.transfer.note;
+    const toName = to === 'stone' ? '石头' : '多多';
     addTransaction({
       type: 'transfer',
       childId: from,
       toChildId: to,
       amount,
-      note: `交换给${to === 'stone' ? '石头' : '多多'}`
+      note: customNote || `交换给${toName}`
     });
     const merges = computeMerges(receiverOldCounts, stashCounts);
     if (merges.length > 0) playMergeAnimation(to, merges);
