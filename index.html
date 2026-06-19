@@ -41,7 +41,6 @@
       background: var(--bg-color);
       color: var(--text-main);
       min-height: 100vh;
-      padding-bottom: 80px;
     }
 
     /* 漂浮背景奖贴 */
@@ -87,16 +86,27 @@
     /* 页面切换 */
     .page {
       display: none;
-      animation: fadeIn 0.3s ease;
-      position: relative;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      min-height: 100vh;
+      padding-bottom: 80px;
+      overflow-x: hidden;
+      overflow-y: auto;
       z-index: 1;
+      touch-action: pan-y;
+      will-change: transform;
+      transform: translateX(0);
     }
     .page.active {
       display: block;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .page.panning {
+      transition: none !important;
+    }
+    .page.snap {
+      transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
     /* 顶部标题 */
@@ -1321,26 +1331,49 @@ function resetData() {
 
 // ========== 页面切换 ==========
 function switchPage(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
+  const target = document.getElementById('page-' + page);
+  if (!target) return;
+
+  const prevActive = document.querySelector('.page.active');
+  if (prevActive && prevActive !== target) {
+    prevActive.dataset.scrollTop = prevActive.scrollTop;
+  }
+
+  // 强制结束可能正在进行的拖拽动画，避免状态冲突
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('panning', 'snap');
+    p.style.transform = '';
+    p.style.zIndex = '';
+    if (p === target) return;
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
+
+  target.classList.add('active');
+  target.style.display = 'block';
+  const targetScrollTop = parseFloat(target.dataset.scrollTop || '0');
+  if (targetScrollTop) target.scrollTop = targetScrollTop;
+
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const activeNav = document.querySelector(`.nav-item[data-page="${page}"]`);
   if (activeNav) activeNav.classList.add('active');
+
   if (page === 'quests') renderQuests2('all');
   if (page === 'ledger') renderLedger();
 }
 
-// 触屏滑动切换页面
+// 触屏滑动切换页面（手指实时跟随）
 (function initSwipeNavigation() {
   const pages = ['home', 'quests', 'ledger', 'settings'];
-  const SWIPE_THRESHOLD = 50;
-  const SWIPE_MAX_VERTICAL = 80;
-  const SWIPE_MAX_TIME = 400;
+  const PAN_START_THRESHOLD = 10;
+  const COMPLETE_RATIO = 0.4;
+  const MIN_VELOCITY = 0.5;
 
   let startX = 0;
   let startY = 0;
   let startTime = 0;
   let tracking = false;
+  let panState = null;
 
   function isSwipeEnabledTarget(target) {
     if (!target) return true;
@@ -1351,6 +1384,16 @@ function switchPage(page) {
     return true;
   }
 
+  function getPageIndex(id) {
+    return pages.indexOf(id.replace('page-', ''));
+  }
+
+  function getAdjacentPage(currentIdx, direction) {
+    const nextIdx = direction === 'left' ? currentIdx + 1 : currentIdx - 1;
+    if (nextIdx < 0 || nextIdx >= pages.length) return null;
+    return document.getElementById('page-' + pages[nextIdx]);
+  }
+
   document.addEventListener('touchstart', function(e) {
     if (!isSwipeEnabledTarget(e.target)) return;
     const touch = e.touches[0];
@@ -1358,44 +1401,136 @@ function switchPage(page) {
     startY = touch.clientY;
     startTime = Date.now();
     tracking = true;
+    panState = null;
   }, { passive: true });
 
   document.addEventListener('touchmove', function(e) {
     if (!tracking) return;
     const touch = e.touches[0];
-    const dy = Math.abs(touch.clientY - startY);
-    if (dy > SWIPE_MAX_VERTICAL) {
-      tracking = false;
+    const dx = touch.clientX - startX;
+    const dy = touch.clientY - startY;
+
+    if (!panState) {
+      if (Math.abs(dx) < PAN_START_THRESHOLD) return;
+      if (Math.abs(dy) > Math.abs(dx) * 1.5) {
+        tracking = false;
+        return;
+      }
+
+      const activePage = document.querySelector('.page.active');
+      if (!activePage) {
+        tracking = false;
+        return;
+      }
+
+      const currentIdx = getPageIndex(activePage.id);
+      const direction = dx < 0 ? 'left' : 'right';
+      const adjacentPage = getAdjacentPage(currentIdx, direction);
+      if (!adjacentPage) {
+        tracking = false;
+        return;
+      }
+
+      panState = {
+        currentPage: activePage,
+        targetPage: adjacentPage,
+        direction: direction,
+        vw: window.innerWidth
+      };
+
+      activePage.dataset.scrollTop = activePage.scrollTop;
+      activePage.classList.add('panning');
+      activePage.style.zIndex = '1';
+      adjacentPage.classList.add('panning', 'active');
+      adjacentPage.style.zIndex = '2';
+      adjacentPage.style.display = 'block';
+
+      // 预渲染目标页，避免滑动时看到空白
+      if (adjacentPage.id === 'page-quests') renderQuests2('all');
+      if (adjacentPage.id === 'page-ledger') renderLedger();
     }
+
+    const ratio = Math.max(-1, Math.min(1, dx / panState.vw));
+    panState.currentPage.style.transform = `translateX(${ratio * 100}%)`;
+    const targetOffset = panState.direction === 'left' ? 1 : -1;
+    panState.targetPage.style.transform = `translateX(${(targetOffset + ratio) * 100}%)`;
   }, { passive: true });
 
   document.addEventListener('touchend', function(e) {
     if (!tracking) return;
     tracking = false;
+    if (!panState) return;
+
     const touch = e.changedTouches[0];
     const dx = touch.clientX - startX;
-    const dy = touch.clientY - startY;
     const dt = Date.now() - startTime;
+    const ratio = dx / panState.vw;
+    const velocity = dt > 0 ? dx / dt : 0;
+    const shouldComplete = Math.abs(ratio) > COMPLETE_RATIO || Math.abs(velocity) > MIN_VELOCITY;
 
-    if (dt > SWIPE_MAX_TIME) return;
-    if (Math.abs(dx) < SWIPE_THRESHOLD) return;
-    if (Math.abs(dy) > SWIPE_MAX_VERTICAL) return;
-    if (Math.abs(dy) >= Math.abs(dx)) return;
+    const current = panState.currentPage;
+    const target = panState.targetPage;
+    const direction = panState.direction;
+    panState = null;
 
-    const activePage = document.querySelector('.page.active');
-    if (!activePage) return;
-    const current = activePage.id.replace('page-', '');
-    const idx = pages.indexOf(current);
-    if (idx < 0) return;
+    current.classList.remove('panning');
+    target.classList.remove('panning');
+    current.classList.add('snap');
+    target.classList.add('snap');
 
-    if (dx < 0 && idx < pages.length - 1) {
-      switchPage(pages[idx + 1]);
-    } else if (dx > 0 && idx > 0) {
-      switchPage(pages[idx - 1]);
+    if (shouldComplete) {
+      current.style.transform = direction === 'left' ? 'translateX(-100%)' : 'translateX(100%)';
+      target.style.transform = 'translateX(0)';
+    } else {
+      current.style.transform = 'translateX(0)';
+      target.style.transform = direction === 'left' ? 'translateX(100%)' : 'translateX(-100%)';
     }
+
+    const onTransitionEnd = function() {
+      if (!current.classList.contains('snap') && !target.classList.contains('snap')) return;
+      current.classList.remove('snap');
+      target.classList.remove('snap');
+      current.style.transform = '';
+      target.style.transform = '';
+      current.style.zIndex = '';
+      target.style.zIndex = '';
+
+      if (shouldComplete) {
+        current.classList.remove('active');
+        current.style.display = 'none';
+        target.classList.add('active');
+        const targetScrollTop = parseFloat(target.dataset.scrollTop || '0');
+        if (targetScrollTop) target.scrollTop = targetScrollTop;
+        const targetName = target.id.replace('page-', '');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const activeNav = document.querySelector(`.nav-item[data-page="${targetName}"]`);
+        if (activeNav) activeNav.classList.add('active');
+        if (targetName === 'quests') renderQuests2('all');
+        if (targetName === 'ledger') renderLedger();
+      } else {
+        target.classList.remove('active');
+        target.style.display = 'none';
+        const scrollTop = parseFloat(current.dataset.scrollTop || '0');
+        if (scrollTop) current.scrollTop = scrollTop;
+      }
+    };
+
+    current.addEventListener('transitionend', onTransitionEnd, { once: true });
+    target.addEventListener('transitionend', onTransitionEnd, { once: true });
   }, { passive: true });
 
   document.addEventListener('touchcancel', function() {
+    if (panState) {
+      panState.currentPage.classList.remove('panning');
+      panState.targetPage.classList.remove('panning');
+      panState.targetPage.classList.remove('active');
+      panState.targetPage.style.display = 'none';
+      panState.targetPage.style.transform = '';
+      panState.targetPage.style.zIndex = '';
+      panState.currentPage.style.transform = '';
+      panState.currentPage.style.zIndex = '';
+      panState = null;
+    }
     tracking = false;
   });
 })();
