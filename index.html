@@ -697,12 +697,12 @@
       transform: scale(0.85);
     }
     .stash-action {
-      font-size: 40px;
+      font-size: 64px;
       line-height: 1;
       cursor: pointer;
       transition: transform 0.15s;
       margin-left: 10px;
-      align-self: center;
+      align-self: flex-end;
       -webkit-tap-highlight-color: transparent;
       filter: drop-shadow(0 2px 2px rgba(0,0,0,0.12));
       animation: stashPopIn 0.35s ease;
@@ -775,9 +775,6 @@
       font-size: 24px;
       transition: transform 0.3s;
       color: var(--stone-color);
-    }
-    .transfer-mini .arrow.reverse {
-      transform: scaleX(-1);
     }
 
     /* 飞入与合并动画 */
@@ -1238,11 +1235,10 @@ function toggleTransferDirection() {
 
   const fromImg = document.getElementById('transfer-from-img');
   const toImg = document.getElementById('transfer-to-img');
-  const arrow = document.getElementById('transfer-mini-arrow');
 
   if (fromImg) fromImg.src = from === 'stone' ? 'shitou.png' : 'duoduo.png';
   if (toImg) toImg.src = to === 'stone' ? 'shitou.png' : 'duoduo.png';
-  if (arrow) arrow.style.transform = transferDirectionReversed ? 'scaleX(-1)' : 'scaleX(1)';
+  // 箭头始终从左指向右，因为左侧永远是转出方，右侧永远是转入方
 }
 
 // 钱包页快捷操作：打开转账并设置为从指定孩子转出
