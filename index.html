@@ -6,18 +6,23 @@
   <title>石头多多理财小助手</title>
   <style>
     :root {
-      --stone-color: #696FC7;
-      --stone-light: #A7AAE1;
-      --duoduo-color: #F2AEBB;
-      --duoduo-light: #F5D3C4;
-      --star-color: #F2AEBB;
-      --super-color: #A7AAE1;
-      --big-color: #F2AEBB;
-      --small-color: #696FC7;
-      --bg-color: #F5D3C4;
+      --blue: #427AB5;
+      --dark-blue: #406AAF;
+      --yellow: #F7DD7D;
+      --cream: #FFE8BE;
+
+      --stone-color: var(--cream);
+      --stone-light: rgba(255, 232, 190, 0.4);
+      --duoduo-color: var(--yellow);
+      --duoduo-light: rgba(247, 221, 125, 0.4);
+      --star-color: var(--yellow);
+      --super-color: #6B9BCF;
+      --big-color: var(--yellow);
+      --small-color: var(--dark-blue);
+      --bg-color: var(--blue);
       --card-bg: #FFFFFF;
-      --text-main: #696FC7;
-      --text-light: #A7AAE1;
+      --text-main: var(--dark-blue);
+      --text-light: #6B9BCF;
     }
 
     * {
@@ -35,10 +40,42 @@
       padding-bottom: 80px;
     }
 
+    /* 漂浮背景奖贴 */
+    .floating-stickers {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .floating-sticker {
+      position: absolute;
+      opacity: 0.1;
+      filter: blur(1px);
+      will-change: transform;
+      animation-name: floatAround;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+    }
+    @keyframes floatAround {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      15% { transform: translate(20px, -30px) rotate(10deg); }
+      30% { transform: translate(-25px, 15px) rotate(-8deg); }
+      45% { transform: translate(15px, 35px) rotate(12deg); }
+      60% { transform: translate(-20px, -15px) rotate(-6deg); }
+      75% { transform: translate(30px, 10px) rotate(8deg); }
+      90% { transform: translate(-10px, -25px) rotate(-4deg); }
+    }
+
     /* 页面切换 */
     .page {
       display: none;
       animation: fadeIn 0.3s ease;
+      position: relative;
+      z-index: 1;
     }
     .page.active {
       display: block;
@@ -59,6 +96,7 @@
       right: 16px;
       top: 20px;
       font-size: 28px;
+      color: var(--cream);
       cursor: pointer;
       transition: transform 0.15s;
       -webkit-tap-highlight-color: transparent;
@@ -66,7 +104,7 @@
     .new-task-icon:active { transform: scale(0.85); }
     .header h1 {
       font-size: 22px;
-      color: var(--text-main);
+      color: var(--cream);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -74,7 +112,7 @@
     }
     .header .subtitle {
       font-size: 13px;
-      color: var(--text-light);
+      color: rgba(255, 232, 190, 0.8);
       margin-top: 4px;
     }
 
@@ -168,13 +206,13 @@
     .action-icon.transfer { color: #FF9800; }
     .child-balance {
       font-size: 13px;
-      color: var(--text-light);
+      color: rgba(255, 232, 190, 0.7);
       line-height: 1.2;
     }
     .child-balance .amount {
       font-size: 20px;
       font-weight: 800;
-      color: var(--text-main);
+      color: var(--cream);
     }
 
     /* 奖贴展示 - 大大的图标 */
@@ -252,6 +290,7 @@
     .section-title {
       font-size: 18px;
       font-weight: 700;
+      color: var(--cream);
       display: flex;
       align-items: center;
       gap: 6px;
@@ -269,8 +308,8 @@
       font-size: 13px;
       font-weight: 600;
       border: none;
-      background: #E8E8F0;
-      color: var(--text-light);
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text-main);
       white-space: nowrap;
       cursor: pointer;
     }
@@ -350,7 +389,7 @@
       font-weight: 600;
       flex-shrink: 0;
     }
-    .status-pending { background: #E8F4FD; color: var(--stone-color); }
+    .status-pending { background: #E8F4FD; color: var(--dark-blue); }
     .status-claimed { background: #FFF8DC; color: #B8960C; }
     .status-done { background: #E8F8E8; color: #2E7D32; }
 
@@ -433,7 +472,7 @@
       transition: color 0.2s;
     }
     .nav-item.active {
-      color: var(--stone-color);
+      color: var(--dark-blue);
     }
     .nav-item .icon {
       font-size: 22px;
@@ -745,7 +784,7 @@
       transform: scale(0.85);
     }
     .note-icon.has-note {
-      filter: drop-shadow(0 0 5px #FFD93D);
+      filter: drop-shadow(0 0 5px var(--yellow));
     }
 
     /* 笔记输入 */
@@ -759,7 +798,7 @@
       padding: 10px 12px;
       border: none;
       border-radius: 12px;
-      background: #FFFDF5;
+      background: var(--cream);
       font-size: 14px;
       color: var(--text-main);
       outline: none;
@@ -846,6 +885,9 @@
   </style>
 </head>
 <body>
+
+<!-- 漂浮背景奖贴 -->
+<div class="floating-stickers" id="floating-stickers"></div>
 
 <!-- ========== 钱包页 ========== -->
 <div class="page active" id="page-home">
@@ -1404,7 +1446,7 @@ function formatCurrency(amount) {
   html += renderStickers(c.supers, 'super');
   html += renderStickers(c.bigs, 'big');
   html += renderStickers(c.smalls, 'small');
-  return html || '<span style="color:var(--text-light);font-size:14px;">空空如也</span>';
+  return html || '<span style="color:var(--cream);font-size:14px;">空空如也</span>';
 }
 
 function renderBalance(childId, amount) {
@@ -1434,7 +1476,7 @@ function renderLedger() {
   const list = document.getElementById('ledger-list');
   const txs = appData.transactions || [];
   if (txs.length === 0) {
-    list.innerHTML = '<div style="text-align:center;color:var(--text-light);padding:40px 16px;font-size:14px;">还没有记账记录哦～</div>';
+    list.innerHTML = '<div style="text-align:center;color:var(--cream);padding:40px 16px;font-size:14px;">还没有记账记录哦～</div>';
     return;
   }
   list.innerHTML = txs.map(tx => renderLedgerCard(tx)).join('');
@@ -2040,7 +2082,34 @@ function confirmTransfer() {
   });
 }
 
+// 初始化漂浮背景奖贴
+function initFloatingStickers() {
+  const container = document.getElementById('floating-stickers');
+  if (!container) return;
+  const types = ['star', 'super', 'big', 'small'];
+  const sizes = { star: 0.35, super: 0.3, big: 0.25, small: 0.2 };
+  const count = 14;
+
+  for (let i = 0; i < count; i++) {
+    const type = types[i % types.length];
+    const cfg = stickerConfig[type];
+    if (!cfg) continue;
+    const el = document.createElement('img');
+    el.className = 'floating-sticker';
+    el.src = cfg.img;
+    el.alt = cfg.name;
+    const size = Math.round(cfg.size * sizes[type] * (0.8 + Math.random() * 0.4));
+    el.style.width = size + 'px';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.top = Math.random() * 100 + '%';
+    el.style.animationDuration = (18 + Math.random() * 22) + 's';
+    el.style.animationDelay = (Math.random() * -30) + 's';
+    container.appendChild(el);
+  }
+}
+
 // ========== 初始化 ==========
+initFloatingStickers();
 renderBalance('stone', getBalance('stone'));
 renderBalance('duoduo', getBalance('duoduo'));
 renderLedger();
