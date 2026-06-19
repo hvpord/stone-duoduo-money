@@ -449,33 +449,50 @@
     .bottom-nav {
       position: fixed;
       bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--card-bg);
+      left: 12px;
+      right: 12px;
+      background: linear-gradient(135deg, var(--cream) 0%, var(--yellow) 100%);
+      border-radius: 24px 24px 0 0;
       display: flex;
       justify-content: space-around;
-      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
-      box-shadow: 0 -2px 20px rgba(0,0,0,0.08);
+      padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.15);
       z-index: 100;
     }
     .nav-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
-      padding: 4px 16px;
+      gap: 2px;
+      padding: 8px 18px;
+      border-radius: 18px;
       border: none;
       background: none;
       color: var(--text-light);
       font-size: 11px;
+      font-weight: 700;
       cursor: pointer;
-      transition: color 0.2s;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-item:active {
+      transform: scale(0.92);
     }
     .nav-item.active {
       color: var(--dark-blue);
+      background: rgba(255, 255, 255, 0.55);
+      box-shadow: 0 0 18px rgba(255, 255, 255, 0.7), 0 3px 10px rgba(0,0,0,0.08);
     }
     .nav-item .icon {
-      font-size: 22px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav-item .icon svg {
+      width: 100%;
+      height: 100%;
     }
 
     /* 弹窗 */
@@ -1001,19 +1018,44 @@
 <!-- ========== 底部导航 ========== -->
 <div class="bottom-nav">
   <button class="nav-item active" onclick="switchPage('home')">
-    <span class="icon">💰</span>
+    <span class="icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 7H4C2.89543 7 2 7.89543 2 9V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V9C22 7.89543 21.1046 7 20 7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M16 13C16 13.5523 16.4477 14 17 14H19C19.5523 14 20 13.5523 20 13V11C20 10.4477 19.5523 10 19 10H17C16.4477 10 16 10.4477 16 11V13Z" fill="currentColor"/>
+        <path d="M6 7V6C6 4.89543 6.89543 4 8 4H16C17.1046 4 18 4.89543 18 6V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
     <span>钱包</span>
   </button>
   <button class="nav-item" onclick="switchPage('quests')">
-    <span class="icon">🎯</span>
+    <span class="icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+        <circle cx="12" cy="12" r="6" fill="currentColor" fill-opacity="0.35"/>
+        <circle cx="12" cy="12" r="3" fill="currentColor"/>
+      </svg>
+    </span>
     <span>任务</span>
   </button>
   <button class="nav-item" onclick="switchPage('ledger')">
-    <span class="icon">📒</span>
+    <span class="icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 3H18C19.1046 3 20 3.89543 20 5V19C20 20.1046 19.1046 21 18 21H6C4.89543 21 4 20.1046 4 19V5C4 3.89543 4.89543 3 6 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M8 12H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M8 16H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M4 6H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </span>
     <span>记账</span>
   </button>
   <button class="nav-item" onclick="switchPage('settings')">
-    <span class="icon">⚙️</span>
+    <span class="icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" fill="currentColor"/>
+        <path d="M19.4 13C19.4764 12.6744 19.5179 12.3383 19.5235 12C19.5179 11.6617 19.4764 11.3256 19.4 11L21.5448 9.35995C21.7402 9.20525 21.7947 8.92433 21.6664 8.70227L19.6266 5.19836C19.4982 4.97631 19.2192 4.88419 18.9736 4.98616L16.4 6.05343C15.9117 5.70665 15.3815 5.42164 14.82 5.20491L14.4 2.52623C14.3509 2.22757 14.0966 2 13.7937 2H9.70633C9.40344 2 9.14907 2.22757 9.1 2.52623L8.68 5.20491C8.11846 5.42164 7.58831 5.70665 7.1 6.05343L4.52641 4.98616C4.28082 4.88419 4.00179 4.97631 3.87343 5.19836L1.83358 8.70227C1.70522 8.92433 1.75972 9.20525 1.95516 9.35995L4.1 11C4.02357 11.3256 3.98214 11.6617 3.97653 12C3.98214 12.3383 4.02357 12.6744 4.1 13L1.95516 14.64C1.75972 14.7947 1.70522 15.0757 1.83358 15.2977L3.87343 18.8016C4.00179 19.0237 4.28082 19.1158 4.52641 19.0138L7.1 17.9466C7.58831 18.2933 8.11846 18.5784 8.68 18.7951L9.1 21.4738C9.14907 21.7724 9.40344 22 9.70633 22H13.7937C14.0966 22 14.3509 21.7724 14.4 21.4738L14.82 18.7951C15.3815 18.5784 15.9117 18.2933 16.4 17.9466L18.9736 19.0138C19.2192 19.1158 19.4982 19.0237 19.6266 18.8016L21.6664 15.2977C21.7947 15.0757 21.7402 14.7947 21.5448 14.64L19.4 13Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+    </span>
     <span>设置</span>
   </button>
 </div>
