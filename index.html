@@ -121,7 +121,7 @@
     }
     .child-header {
       display: flex;
-      align-items: flex-start;
+      align-items: flex-end;
       gap: 12px;
       margin-bottom: 4px;
     }
@@ -130,7 +130,7 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
-      padding-top: 4px;
+      padding-top: 0;
     }
     .child-name {
       font-size: 24px;
@@ -147,22 +147,25 @@
     .duoduo .child-name, .duoduo .child-total { color: var(--duoduo-color); }
     .child-actions {
       display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-top: 4px;
+      gap: 6px;
+      align-items: flex-end;
+      padding-bottom: 2px;
     }
     .action-icon {
-      font-size: 30px;
+      font-size: 58px;
+      font-weight: 800;
       line-height: 1;
       cursor: pointer;
       transition: transform 0.15s;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
+      filter: drop-shadow(0 3px 3px rgba(0,0,0,0.15));
+      text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
     }
     .action-icon:active { transform: scale(0.85); }
     .action-icon.income { color: #4CAF50; }
     .action-icon.expense { color: #E74C3C; }
-    .action-icon.transfer { color: var(--text-main); }
+    .action-icon.transfer { color: #FF9800; }
     .child-balance {
       font-size: 13px;
       color: var(--text-light);
@@ -822,11 +825,11 @@
         <div class="child-info">
           <div class="child-name">石头</div>
           <div class="child-total" id="stone-total">¥0</div>
-          <div class="child-actions">
-            <span class="action-icon income" onclick="openIncomeFor('stone', event)">➕</span>
-            <span class="action-icon expense" onclick="openExpenseFor('stone', event)">➖</span>
-            <span class="action-icon transfer" onclick="openTransferFrom('stone', event)">↔️</span>
-          </div>
+        </div>
+        <div class="child-actions">
+          <span class="action-icon income" onclick="openIncomeFor('stone', event)">+</span>
+          <span class="action-icon expense" onclick="openExpenseFor('stone', event)">−</span>
+          <span class="action-icon transfer" onclick="openTransferFrom('stone', event)">↔</span>
         </div>
       </div>
       <div class="child-balance" onclick="showChildDetail('stone')">
@@ -842,11 +845,11 @@
         <div class="child-info">
           <div class="child-name">多多</div>
           <div class="child-total" id="duoduo-total">¥0</div>
-          <div class="child-actions">
-            <span class="action-icon income" onclick="openIncomeFor('duoduo', event)">➕</span>
-            <span class="action-icon expense" onclick="openExpenseFor('duoduo', event)">➖</span>
-            <span class="action-icon transfer" onclick="openTransferFrom('duoduo', event)">↔️</span>
-          </div>
+        </div>
+        <div class="child-actions">
+          <span class="action-icon income" onclick="openIncomeFor('duoduo', event)">+</span>
+          <span class="action-icon expense" onclick="openExpenseFor('duoduo', event)">−</span>
+          <span class="action-icon transfer" onclick="openTransferFrom('duoduo', event)">↔</span>
         </div>
       </div>
       <div class="child-balance" onclick="showChildDetail('duoduo')">
