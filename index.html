@@ -366,21 +366,85 @@
       background: var(--star-color);
       color: #5A4A00;
     }
+    .filter-tab-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      padding: 0;
+      border: 2px solid transparent;
+      background: rgba(255, 255, 255, 0.9);
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .filter-tab-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .filter-tab-avatar.active {
+      border-color: var(--star-color);
+      box-shadow: 0 0 0 3px rgba(255, 217, 61, 0.4), 0 0 18px rgba(255, 217, 61, 0.5);
+      transform: scale(1.1);
+      background: #fff;
+    }
+    .filter-tab-avatar.both-avatar {
+      position: relative;
+      width: 56px;
+      height: 36px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+    .filter-tab-avatar.both-avatar img:first-child,
+    .filter-tab-avatar.both-avatar img:last-child {
+      position: static;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      z-index: auto;
+    }
+    .filter-tab-avatar.both-avatar.active {
+      background: #fff;
+    }
+    .new-task-btn {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      font-weight: 800;
+      color: #4CAF50;
+      background: none;
+      border: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      font-family: "Comic Sans MS", "Chalkboard SE", "Hannotate SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+    }
+    .new-task-btn:active { transform: translateY(-50%) scale(0.9); }
 
     .quest-list {
       padding: 0 16px;
     }
     .quest-card {
-      background: var(--card-bg);
+      background: linear-gradient(135deg, rgba(255, 230, 210, 0.9) 0%, rgba(255, 250, 220, 0.85) 100%);
       border-radius: 16px;
       padding: 14px 16px;
       margin-bottom: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
       display: flex;
       align-items: center;
       gap: 12px;
       cursor: pointer;
       transition: transform 0.15s;
+      border: 1px solid rgba(255, 255, 255, 0.45);
     }
     .quest-card:active {
       transform: scale(0.98);
@@ -407,9 +471,18 @@
       font-size: 15px;
       font-weight: 700;
       margin-bottom: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      word-break: break-word;
+      line-height: 1.4;
+    }
+    .quest-reward-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 2px;
+      margin-top: 6px;
+    }
+    .quest-reward-row > * {
+      min-width: 0;
     }
     .quest-meta {
       font-size: 12px;
@@ -493,6 +566,60 @@
       font-weight: 700;
       color: #5A4A00;
     }
+
+    /* 任务列表静态头像 */
+    .quest-avatars-static {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      flex-shrink: 0;
+      margin-right: 4px;
+    }
+    .quest-avatars-static .quest-avatar {
+      width: 44px;
+      height: 44px;
+      border-width: 2px;
+      cursor: default;
+    }
+    .quest-avatars-static .quest-avatar:active {
+      transform: none;
+    }
+    .quest-avatars-static.both .quest-avatar {
+      width: 32px;
+      height: 32px;
+      border-width: 2px;
+    }
+    .quest-avatars-static.both .quest-avatar:first-child {
+      margin-right: 0;
+      z-index: 1;
+    }
+    .quest-avatars-static.both .quest-avatar:last-child {
+      z-index: 2;
+    }
+
+    /* 任务操作按钮 */
+    .quest-actions {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      align-items: center;
+      padding: 20px 0 10px;
+    }
+    .quest-action-btn {
+      font-size: 24px;
+      font-weight: 800;
+      background: none;
+      border: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      font-family: "Comic Sans MS", "Chalkboard SE", "Hannotate SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      transition: transform 0.15s;
+      text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+    }
+    .quest-action-btn.complete { color: #4CAF50; }
+    .quest-action-btn.edit { color: #6B9BCF; }
+    .quest-action-btn.delete { color: #E74C3C; }
+    .quest-action-btn:active { transform: scale(0.85); }
 
     /* 底部导航 */
     .bottom-nav {
@@ -960,7 +1087,6 @@
   <div class="header">
     <h1>💰 钱包</h1>
     <div class="subtitle">看看石头和多多有多少资产</div>
-    <span class="new-task-icon" onclick="openModal('modal-quest')">✨</span>
   </div>
 
   <div class="children-grid">
@@ -991,7 +1117,7 @@
           </span>
         </div>
       </div>
-      <div class="child-balance" onclick="showChildDetail('stone')">
+      <div class="child-balance">
         <div class="currency-display" id="stone-balance"></div>
       </div>
     </div>
@@ -1023,7 +1149,7 @@
           </span>
         </div>
       </div>
-      <div class="child-balance" onclick="showChildDetail('duoduo')">
+      <div class="child-balance">
         <div class="currency-display" id="duoduo-balance"></div>
       </div>
     </div>
@@ -1036,11 +1162,19 @@
     <h1>🎯 任务中心</h1>
     <div class="subtitle">完成任务，赚取奖励贴！</div>
   </div>
-  <div class="filter-tabs">
-    <button class="filter-tab active" onclick="filterQuests2('all')">全部</button>
-    <button class="filter-tab" onclick="filterQuests2('task')">🎯 任务</button>
-    <button class="filter-tab" onclick="filterQuests2('wish')">⭐ 心愿</button>
-    <button class="filter-tab" onclick="filterQuests2('challenge')">🏆 挑战</button>
+  <div class="filter-tabs" style="position:relative;">
+    <button class="filter-tab active" data-filter="all" onclick="filterQuests2('all')">全部</button>
+    <button class="filter-tab-avatar" data-filter="stone" onclick="filterQuests2('stone')">
+      <img src="shitou.png" alt="石头的">
+    </button>
+    <button class="filter-tab-avatar" data-filter="duoduo" onclick="filterQuests2('duoduo')">
+      <img src="duoduo.png" alt="多多的">
+    </button>
+    <button class="filter-tab-avatar both-avatar" data-filter="both" onclick="filterQuests2('both')">
+      <img src="shitou.png" alt="石头">
+      <img src="duoduo.png" alt="多多">
+    </button>
+    <button class="new-task-btn" onclick="openQuestModal()">新建任务</button>
   </div>
   <div class="quest-list" id="quest-list2"></div>
 </div>
@@ -1240,72 +1374,81 @@
   </div>
 </div>
 
-<!-- ========== 弹窗：新建任务/心愿 ========== -->
-<div class="modal-overlay" id="modal-quest">
+<!-- ========== 弹窗：新建/修改任务 ========== -->
+<div class="modal-overlay currency-modal" id="modal-quest">
   <div class="modal-sheet">
     <div class="modal-header">
-      <div class="modal-title">✨ 发布探险</div>
-      <button class="modal-close" onclick="closeModal('modal-quest')">✕</button>
+      <div class="modal-title" id="quest-modal-title">✨ 新建任务</div>
+      <button class="modal-close" onclick="closeQuestModal()">✕</button>
     </div>
     <div class="form-group">
-      <label class="form-label">类型</label>
-      <select class="form-select" id="quest-type">
-        <option value="task">🎯 任务（完成后得奖励）</option>
-        <option value="wish">⭐ 心愿（存钱目标）</option>
-        <option value="challenge">🏆 挑战（限时任务）</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">标题</label>
-      <input class="form-input" placeholder="比如：整理房间、想买乐高">
-    </div>
-    <div class="form-group">
-      <label class="form-label">奖励 / 目标金额</label>
-      <div class="currency-picker">
-        <div class="currency-option">
-          <img class="emoji" src="xingqiu.png" alt="星球" style="width:calc(64px * var(--sticker-scale));height:calc(64px * var(--sticker-scale));">
-          <span class="name">星球</span>
+      <label class="form-label">属于谁</label>
+      <div class="avatar-picker">
+        <div class="avatar-option" id="quest-assign-stone" onclick="toggleQuestAssignee('stone')">
+          <img src="shitou.png" alt="石头">
+          <span class="avatar-name">石头</span>
         </div>
-        <div class="currency-option">
-          <img class="emoji" src="chaodajiangtie.png" alt="超大贴" style="width:calc(64px * var(--sticker-scale));height:calc(64px * var(--sticker-scale));">
-          <span class="name">超大贴</span>
-        </div>
-        <div class="currency-option selected">
-          <img class="emoji" src="dajiangtie.png" alt="大奖贴" style="width:calc(56px * var(--sticker-scale));height:calc(56px * var(--sticker-scale));">
-          <span class="name">大奖贴</span>
-        </div>
-        <div class="currency-option">
-          <img class="emoji" src="xiaojiangtie.png" alt="小奖贴" style="width:calc(48px * var(--sticker-scale));height:calc(48px * var(--sticker-scale));">
-          <span class="name">小奖贴</span>
+        <div class="avatar-option duoduo-option" id="quest-assign-duoduo" onclick="toggleQuestAssignee('duoduo')">
+          <img src="duoduo.png" alt="多多">
+          <span class="avatar-name">多多</span>
         </div>
       </div>
-      <input class="form-input" type="number" placeholder="数量" value="2">
     </div>
     <div class="form-group">
-      <label class="form-label">布置给</label>
-      <select class="form-select">
-        <option>石头</option>
-        <option>多多</option>
-        <option>两人都可以</option>
-      </select>
+      <label class="form-label">任务目标</label>
+      <input class="form-input" id="quest-title-input" placeholder="比如：整理房间、帮妈妈拿快递">
     </div>
-    <button class="btn-primary">发布</button>
+    <div class="form-group">
+      <label class="form-label">任务奖励</label>
+      <div class="currency-staging-area" id="quest-stash-area" onclick="handleStashClick('quest', event)">
+        <span class="staging-hint" id="quest-stash-hint">点击下面奖贴添加...</span>
+      </div>
+      <div class="staging-total" id="quest-total">
+        <span id="quest-total-amount">合计：¥0</span>
+      </div>
+    </div>
+    <div class="currency-picker-simple">
+      <div class="currency-item" onclick="addToStash('quest', 'star', event)">
+        <img src="xingqiu.png" alt="星球" style="width:calc(84px * var(--sticker-scale));height:calc(84px * var(--sticker-scale));">
+      </div>
+      <div class="currency-item" onclick="addToStash('quest', 'super', event)">
+        <img src="chaodajiangtie.png" alt="超大贴" style="width:calc(64px * var(--sticker-scale));height:calc(64px * var(--sticker-scale));">
+      </div>
+      <div class="currency-item" onclick="addToStash('quest', 'big', event)">
+        <img src="dajiangtie.png" alt="大奖贴" style="width:calc(48px * var(--sticker-scale));height:calc(48px * var(--sticker-scale));">
+      </div>
+      <div class="currency-item" onclick="addToStash('quest', 'small', event)">
+        <img src="xiaojiangtie.png" alt="小奖贴" style="width:calc(36px * var(--sticker-scale));height:calc(36px * var(--sticker-scale));">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 弹窗：任务操作 ========== -->
+<div class="modal-overlay" id="modal-quest-actions">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div class="modal-title">任务操作</div>
+      <button class="modal-close" onclick="closeModal('modal-quest-actions')">✕</button>
+    </div>
+    <div class="quest-actions">
+      <button class="quest-action-btn complete" onclick="completeQuest(currentActionQuestId)">完成</button>
+      <button class="quest-action-btn edit" onclick="editQuest(currentActionQuestId)">修改</button>
+      <button class="quest-action-btn delete" onclick="deleteQuest(currentActionQuestId)">删除</button>
+    </div>
   </div>
 </div>
 
 <script>
 // ========== 示例数据 ==========
-// assignee: 'stone' | 'duoduo' | 'both' - 谁可以领取
-// claimedBy: ['stone'] | ['duoduo'] | ['stone', 'duoduo'] - 已被谁领取
-// completedBy: ['stone'] | ['duoduo'] | ['stone', 'duoduo'] - 已被谁完成
-// rewardSplit: true - 平分奖励（both任务）
+// assignee: 'stone' | 'duoduo' | 'both' - 谁的任务
+// reward: 奖励金额（元）
+// rewardStash: 奖励奖贴组成数组，如 ['big', 'big']
 let demoQuests = [
-  { id: 1, type: 'task', title: '整理自己的书包', reward: 5, rewardUnit: 'big', assignee: 'stone', creator: 'parent', claimedBy: [], completedBy: [], icon: '🎒' },
-  { id: 2, type: 'wish', title: '想买新乐高', reward: 500, rewardUnit: 'yuan', assignee: 'stone', creator: 'stone', claimedBy: [], completedBy: [], icon: '🧩', progress: 1505, target: 2000 },
-  { id: 3, type: 'task', title: '帮妈妈拿快递', reward: 2.5, rewardUnit: 'small', assignee: 'duoduo', creator: 'stone', claimedBy: ['duoduo'], completedBy: [], icon: '📦' },
-  { id: 4, type: 'challenge', title: '一周不玩手机游戏', reward: 50, rewardUnit: 'super', assignee: 'both', creator: 'parent', claimedBy: [], completedBy: [], icon: '📱', deadline: '2026-06-17', rewardSplit: true },
-  { id: 5, type: 'task', title: '一起打扫客厅', reward: 10, rewardUnit: 'big', assignee: 'both', creator: 'parent', claimedBy: ['stone', 'duoduo'], completedBy: ['stone', 'duoduo'], icon: '🧹', rewardSplit: true },
-  { id: 6, type: 'wish', title: '存够一个星球', reward: 1000, rewardUnit: 'yuan', assignee: 'duoduo', creator: 'duoduo', claimedBy: ['duoduo'], completedBy: ['duoduo'], icon: '🪐', progress: 1000, target: 1000 },
+  { id: 1, title: '整理自己的书包', reward: 5, rewardStash: ['big'], assignee: 'stone', creator: 'parent', claimedBy: [], completedBy: [] },
+  { id: 2, title: '帮妈妈拿快递', reward: 5, rewardStash: ['small', 'small'], assignee: 'duoduo', creator: 'parent', claimedBy: [], completedBy: [] },
+  { id: 3, title: '一周不玩手机游戏', reward: 50, rewardStash: ['super'], assignee: 'both', creator: 'parent', claimedBy: [], completedBy: [] },
+  { id: 4, title: '一起打扫客厅', reward: 10, rewardStash: ['big', 'big'], assignee: 'both', creator: 'parent', claimedBy: [], completedBy: [] },
 ];
 
 const unitNames = {
@@ -1325,6 +1468,30 @@ function loadData() {
     try {
       const data = JSON.parse(saved);
       if (!data.transactions) data.transactions = [];
+      if (data.quests) {
+        data.quests = data.quests.map(q => {
+          const migrated = {
+            id: q.id ?? Date.now() + Math.random(),
+            title: q.title ?? '未命名任务',
+            assignee: q.assignee ?? 'stone',
+            creator: q.creator ?? 'parent',
+            claimedBy: Array.isArray(q.claimedBy) ? q.claimedBy : [],
+            completedBy: Array.isArray(q.completedBy) ? q.completedBy : []
+          };
+          // 旧数据使用 rewardUnit，需要换算成元和奖贴数组
+          if (!q.rewardStash && q.rewardUnit) {
+            const unitValue = unitNames[q.rewardUnit]?.value ?? 1;
+            migrated.reward = Math.round((q.reward ?? 0) * unitValue * 10) / 10;
+            migrated.rewardStash = amountToStash(migrated.reward);
+          } else {
+            migrated.reward = q.reward ?? 0;
+            migrated.rewardStash = Array.isArray(q.rewardStash)
+              ? q.rewardStash.map(item => typeof item === 'string' ? item : item.type)
+              : amountToStash(migrated.reward);
+          }
+          return migrated;
+        });
+      }
       return data;
     } catch (e) {
       console.warn('读取本地数据失败，使用默认数据');
@@ -1596,13 +1763,15 @@ function closeModal(id) {
 const currencyStashes = {
   income: [],
   expense: [],
-  transfer: []
+  transfer: [],
+  quest: []
 };
 
 const currencyContexts = {
   income: { childId: 'stone', note: '' },
   expense: { childId: 'stone', note: '' },
-  transfer: { from: 'stone', to: 'duoduo', reversed: false, note: '' }
+  transfer: { from: 'stone', to: 'duoduo', reversed: false, note: '' },
+  quest: { note: '', assignees: [] }
 };
 
 function closeCurrencyModal(mode) {
@@ -1712,6 +1881,126 @@ function openTransferFrom(childId, event) {
   openModal('modal-transfer');
 }
 
+// ========== 任务弹窗 ==========
+let editingQuestId = null;
+let currentActionQuestId = null;
+
+function amountToStash(amount) {
+  let remaining = Math.round(amount * 10) / 10;
+  const stash = [];
+  const stars = Math.floor(remaining / 1000); remaining = Math.round((remaining - stars * 1000) * 10) / 10;
+  const supers = Math.floor(remaining / 50); remaining = Math.round((remaining - supers * 50) * 10) / 10;
+  const bigs = Math.floor(remaining / 5); remaining = Math.round((remaining - bigs * 5) * 10) / 10;
+  const smalls = Math.floor(remaining / 2.5);
+  for (let i = 0; i < stars; i++) stash.push('star');
+  for (let i = 0; i < supers; i++) stash.push('super');
+  for (let i = 0; i < bigs; i++) stash.push('big');
+  for (let i = 0; i < smalls; i++) stash.push('small');
+  return stash;
+}
+
+function closeQuestModal() {
+  closeModal('modal-quest');
+  currencyStashes.quest = [];
+  currencyContexts.quest.note = '';
+  currencyContexts.quest.assignees = [];
+  editingQuestId = null;
+  document.getElementById('quest-title-input').value = '';
+  document.getElementById('quest-assign-stone').classList.remove('selected');
+  document.getElementById('quest-assign-duoduo').classList.remove('selected');
+  renderStash('quest');
+}
+
+function openQuestModal(id) {
+  editingQuestId = id || null;
+  currencyStashes.quest = [];
+  currencyContexts.quest.assignees = [];
+  document.getElementById('quest-title-input').value = '';
+  document.getElementById('quest-assign-stone').classList.remove('selected');
+  document.getElementById('quest-assign-duoduo').classList.remove('selected');
+
+  if (id) {
+    const q = demoQuests.find(x => x.id === id);
+    if (q) {
+      document.getElementById('quest-modal-title').textContent = '✏️ 修改任务';
+      document.getElementById('quest-title-input').value = q.title;
+      currencyStashes.quest = q.rewardStash ? [...q.rewardStash] : amountToStash(q.reward);
+      if (q.assignee === 'both') {
+        currencyContexts.quest.assignees = ['stone', 'duoduo'];
+        document.getElementById('quest-assign-stone').classList.add('selected');
+        document.getElementById('quest-assign-duoduo').classList.add('selected');
+      } else {
+        currencyContexts.quest.assignees = [q.assignee];
+        document.getElementById('quest-assign-' + q.assignee).classList.add('selected');
+      }
+    }
+  } else {
+    document.getElementById('quest-modal-title').textContent = '✨ 新建任务';
+  }
+
+  renderStash('quest');
+  openModal('modal-quest');
+}
+
+function toggleQuestAssignee(childId) {
+  const assignees = currencyContexts.quest.assignees;
+  const idx = assignees.indexOf(childId);
+  if (idx >= 0) {
+    assignees.splice(idx, 1);
+  } else {
+    assignees.push(childId);
+  }
+  document.getElementById('quest-assign-' + childId).classList.toggle('selected', assignees.includes(childId));
+}
+
+function confirmQuestModal() {
+  const title = document.getElementById('quest-title-input').value.trim();
+  const assignees = currencyContexts.quest.assignees;
+  if (!title) {
+    alert('请输入任务目标哦～');
+    return;
+  }
+  if (assignees.length === 0) {
+    alert('请选择任务属于谁～');
+    return;
+  }
+  const reward = getStashAmount('quest');
+  if (reward <= 0) {
+    alert('请添加任务奖励～');
+    return;
+  }
+
+  const assignee = assignees.length === 2 ? 'both' : assignees[0];
+  const rewardStash = currencyStashes.quest.map(item => typeof item === 'string' ? item : item.type);
+
+  if (editingQuestId) {
+    const q = demoQuests.find(x => x.id === editingQuestId);
+    if (q) {
+      q.title = title;
+      q.assignee = assignee;
+      q.reward = reward;
+      q.rewardStash = rewardStash;
+    }
+  } else {
+    demoQuests.unshift({
+      id: Date.now(),
+      title,
+      reward,
+      rewardStash,
+      rewardUnit: 'yuan',
+      assignee,
+      creator: 'parent',
+      claimedBy: [],
+      completedBy: []
+    });
+  }
+
+  const renderFilter = editingQuestId ? currentQuestFilter : 'all';
+  saveData();
+  closeQuestModal();
+  renderQuests2(renderFilter);
+}
+
 // ========== 奖贴换算 ==========
 function convertToCurrency(amount) {
   let remaining = Math.round(amount * 10) / 10;
@@ -1785,16 +2074,12 @@ function renderBalance(childId, amount) {
   }
 }
 
-// ========== 渲染探险列表 ==========
-function renderQuests(filter) {
-  const list = document.getElementById('quest-list');
-  const filtered = filter === 'all' ? demoQuests : demoQuests.filter(q => q.type === filter);
-  list.innerHTML = filtered.map(q => renderQuestCard(q)).join('');
-}
-
+// ========== 渲染任务列表 ==========
 function renderQuests2(filter) {
   const list = document.getElementById('quest-list2');
-  const filtered = filter === 'all' ? demoQuests : demoQuests.filter(q => q.type === filter);
+  const filtered = filter === 'all'
+    ? demoQuests
+    : demoQuests.filter(q => q.assignee === filter);
   list.innerHTML = filtered.map(q => renderQuestCard(q)).join('');
 }
 
@@ -1812,237 +2097,129 @@ function renderLedgerCard(tx) {
   const date = new Date(tx.date);
   const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   const childName = tx.childId === 'stone' ? '石头' : '多多';
-  const childAvatar = `<img src="${tx.childId === 'stone' ? 'shitou.png' : 'duoduo.png'}" alt="${childName}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">`;
 
-  let icon = '💰';
-  let iconClass = 'task';
   let amountHtml = formatCurrency(tx.amount);
+  let avatarHtml = renderLedgerAvatars(tx);
   if (tx.type === 'expense') {
-    icon = '🛒';
-    iconClass = 'wish';
     amountHtml = `<span style="color:#E74C3C;">${formatCurrency(tx.amount)}</span>`;
   } else if (tx.type === 'transfer') {
-    icon = '🔄';
-    iconClass = 'challenge';
     const toName = tx.toChildId === 'stone' ? '石头' : '多多';
     amountHtml = `<span style="color:var(--text-light);">→ ${toName}</span> ${formatCurrency(tx.amount)}`;
   }
 
   return `
     <div class="quest-card">
-      <div class="quest-icon ${iconClass}" style="font-size:20px;">${icon}</div>
+      <div class="quest-avatars-static ${tx.type === 'transfer' ? 'both' : ''}">${avatarHtml}</div>
       <div class="quest-info">
         <div class="quest-title">${tx.note}</div>
-        <div class="quest-meta">${dateStr} · ${childAvatar} ${childName}</div>
+        <div class="quest-meta">${dateStr} · ${childName}</div>
+        <div class="quest-reward-row ledger-reward-row">${amountHtml}</div>
       </div>
-      <div class="quest-reward" style="font-size:13px;">${amountHtml}</div>
     </div>
   `;
+}
+
+function renderLedgerAvatars(tx) {
+  const stoneImg = '<img src="shitou.png" alt="石头">';
+  const duoImg = '<img src="duoduo.png" alt="多多">';
+  const makeAvatar = (childId) => {
+    const isStone = childId === 'stone';
+    return `<div class="quest-avatar ${isStone ? '' : 'duoduo-avatar'}">${isStone ? stoneImg : duoImg}</div>`;
+  };
+  if (tx.type === 'transfer' && tx.toChildId) {
+    return makeAvatar(tx.childId) + makeAvatar(tx.toChildId);
+  }
+  return makeAvatar(tx.childId);
 }
 
 function renderQuestCard(q) {
   return `
-    <div class="quest-card" onclick="handleQuest(${q.id})">
-      <div class="quest-icon ${q.type}">${q.icon}</div>
+    <div class="quest-card" onclick="openQuestActions(${q.id})">
+      <div class="quest-avatars-static ${q.assignee === 'both' ? 'both' : ''}">
+        ${renderQuestAvatarsStatic(q)}
+      </div>
       <div class="quest-info">
         <div class="quest-title">${q.title}</div>
-        <div class="quest-meta">${getCreatorLabel(q.creator)} · ${getRewardLabel(q)}</div>
-      </div>
-      <div class="quest-avatars">
-        ${renderQuestAvatars(q)}
-      </div>
-      <div>
-        <div class="quest-reward">${formatReward(q.reward, q.rewardUnit, q)}</div>
-        <div class="quest-status ${getStatusClass(q)}">${getStatusLabel(q)}</div>
+        <div class="quest-reward-row">${formatCurrency(q.reward)}</div>
       </div>
     </div>
   `;
 }
 
-// 渲染任务卡片上的两个孩子头像
-function renderQuestAvatars(q) {
-  // 石头头像状态
-  const stoneCanClaim = q.assignee === 'stone' || q.assignee === 'both';
-  const stoneClaimed = q.claimedBy.includes('stone');
-  const stoneCompleted = q.completedBy.includes('stone');
-  let stoneClass = 'quest-avatar';
-  if (stoneCompleted || stoneClaimed) stoneClass += ' bright';
-  else if (stoneCanClaim) stoneClass += ' dim';
-
-  // 多多头像状态
-  const duoCanClaim = q.assignee === 'duoduo' || q.assignee === 'both';
-  const duoClaimed = q.claimedBy.includes('duoduo');
-  const duoCompleted = q.completedBy.includes('duoduo');
-  let duoClass = 'quest-avatar duoduo-avatar';
-  if (duoCompleted || duoClaimed) duoClass += ' bright';
-  else if (duoCanClaim) duoClass += ' dim';
-
-  // 平分标记
-  const splitBadge = q.rewardSplit && q.assignee === 'both' ? '<span class="reward-split">½</span>' : '';
-
-  // 判断是否可以点击
-  const stoneClickable = stoneCanClaim && !stoneClaimed && !stoneCompleted;
-  const duoClickable = duoCanClaim && !duoClaimed && !duoCompleted;
-
-  const stoneOnclick = stoneClickable ? `onclick="claimQuest('stone', ${q.id}, event)"` : '';
-  const duoOnclick = duoClickable ? `onclick="claimQuest('duoduo', ${q.id}, event)"` : '';
-
+// 渲染任务列表中的静态头像
+function renderQuestAvatarsStatic(q) {
   const stoneImg = '<img src="shitou.png" alt="石头">';
   const duoImg = '<img src="duoduo.png" alt="多多">';
-
-  return `
-    <div class="${stoneClass}" ${stoneOnclick}>${stoneImg}${q.assignee === 'both' && q.rewardSplit ? splitBadge : ''}</div>
-    <div class="${duoClass}" ${duoOnclick}>${duoImg}</div>
+  if (q.assignee === 'both') {
+    return `
+      <div class="quest-avatar">${stoneImg}</div>
+      <div class="quest-avatar duoduo-avatar">${duoImg}</div>
+    `;
+  }
+  const isStone = q.assignee === 'stone';
+  return `<div class="quest-avatar ${isStone ? '' : 'duoduo-avatar'}">${isStone ? stoneImg : duoImg}</div>
   `;
 }
 
-function getCreatorLabel(c) {
-  const map = { parent: '爸妈', stone: '石头', duoduo: '多多' };
-  return map[c] || c;
+let currentQuestFilter = 'all';
+
+function filterQuests2(filter) {
+  currentQuestFilter = filter;
+  document.querySelectorAll('#page-quests .filter-tab, #page-quests .filter-tab-avatar').forEach(t => t.classList.remove('active'));
+  const activeBtn = document.querySelector(`#page-quests [data-filter="${filter}"]`);
+  if (activeBtn) activeBtn.classList.add('active');
+  renderQuests2(filter);
 }
 
-function getRewardLabel(q) {
-  if (q.assignee === 'both') {
-    return q.rewardSplit ? '两人平分' : '两人都可领';
-  }
-  return q.assignee === 'stone' ? '石头专属' : '多多专属';
+// 任务操作：完成 / 修改 / 删除
+function openQuestActions(id) {
+  currentActionQuestId = id;
+  openModal('modal-quest-actions');
 }
 
-function getStatusClass(q) {
-  const allCompleted = isQuestCompleted(q);
-  if (allCompleted) return 'status-done';
-  if (q.claimedBy.length > 0) return 'status-claimed';
-  return 'status-pending';
-}
-
-function getStatusLabel(q) {
-  const allCompleted = isQuestCompleted(q);
-  if (allCompleted) return '已完成';
-  if (q.claimedBy.length > 0) {
-    const total = q.assignee === 'both' ? 2 : 1;
-    return `进行中 ${q.claimedBy.length}/${total}`;
-  }
-  return '待领取';
-}
-
-function isQuestCompleted(q) {
-  if (q.assignee === 'both') {
-    return q.completedBy.includes('stone') && q.completedBy.includes('duoduo');
-  }
-  return q.completedBy.includes(q.assignee);
-}
-
-// 用奖贴图标表示奖励（最多显示5个图标）
-function formatReward(amount, unit, q) {
-  if (unit === 'yuan') {
-    return formatCurrency(amount);
-  }
-  const cfg = stickerConfig[unit];
-  if (!cfg) return '';
-  // 把金额换算成对应奖贴数量（如 5 元 = 1 个大奖贴）
-  const unitValue = unitNames[unit].value;
-  let displayAmount = amount / unitValue;
-  // 如果是平分任务且是both，显示每人分得的数量
-  if (q && q.rewardSplit && q.assignee === 'both') {
-    displayAmount = (amount / 2) / unitValue;
-  }
-  const count = Math.min(Math.floor(displayAmount), 6);
-  const extra = displayAmount > 6 ? `+${Math.floor(displayAmount - 6)}` : '';
-  let icons = '';
-  for (let i = 0; i < count; i++) {
-    icons += getStickerHtml(unit, 44);
-  }
-  return `<span style="display:inline-flex;align-items:flex-end;gap:1px;white-space:nowrap;">${icons}<span style="font-size:13px;color:var(--text-light);">${extra}</span></span>`;
-}
-
-// 点击头像领取任务
-function claimQuest(childId, questId, event) {
-  event.stopPropagation();
-  const q = demoQuests.find(x => x.id === questId);
-  if (!q) return;
-
-  // 检查是否有资格
-  const canClaim = q.assignee === childId || q.assignee === 'both';
-  if (!canClaim) {
-    alert('这个任务不属于你哦！');
-    return;
-  }
-
-  // 检查是否已领取
-  const alreadyClaimed = q.claimedBy.includes(childId);
-  const alreadyCompleted = q.completedBy.includes(childId);
-
-  if (alreadyCompleted) {
-    alert('你已经完成啦！');
-    return;
-  }
-
-  if (!alreadyClaimed) {
-    // 领取任务 - 头像变亮
-    q.claimedBy.push(childId);
-    saveData();
-    renderQuests2('all');
-  } else {
-    // 已领取，点击完成 - 发放奖励
-    q.completedBy.push(childId);
-    const reward = q.rewardSplit && q.assignee === 'both' ? q.reward / 2 : q.reward;
-    adjustBalance(childId, reward);
-    addTransaction({
-      type: 'income',
-      childId,
-      amount: reward,
-      note: `完成「${q.title}」获得奖励`
-    });
-    renderQuests2('all');
-  }
-}
-
-// 点击卡片其他区域显示详情
-function handleQuest(id) {
+function completeQuest(id) {
   const q = demoQuests.find(x => x.id === id);
   if (!q) return;
 
-  const allCompleted = isQuestCompleted(q);
-  if (allCompleted) {
-    alert(`✅「${q.title}」\n已完成！`);
-    return;
-  }
-
-  // 显示任务详情
-  const claimedList = q.claimedBy.map(c => c === 'stone' ? '石头' : '多多').join('、');
-  const completedList = q.completedBy.map(c => c === 'stone' ? '石头' : '多多').join('、');
-  let msg = `📋 ${q.title}\n\n`;
-  msg += `奖励：${formatReward(q.reward, q.rewardUnit, q)}\n`;
   if (q.assignee === 'both') {
-    msg += q.rewardSplit ? '类型：两人平分\n' : '类型：两人都可领\n';
+    const perChild = Math.round((q.reward / 2) * 10) / 10;
+    adjustBalance('stone', perChild);
+    adjustBalance('duoduo', perChild);
+    addTransaction({ type: 'income', childId: 'stone', amount: perChild, note: `完成「${q.title}」获得奖励` });
+    addTransaction({ type: 'income', childId: 'duoduo', amount: perChild, note: `完成「${q.title}」获得奖励` });
   } else {
-    msg += `类型：${q.assignee === 'stone' ? '石头' : '多多'}专属\n`;
+    adjustBalance(q.assignee, q.reward);
+    addTransaction({ type: 'income', childId: q.assignee, amount: q.reward, note: `完成「${q.title}」获得奖励` });
   }
-  if (claimedList) msg += `\n已领取：${claimedList}`;
-  if (completedList) msg += `\n已完成：${completedList}`;
-  if (!claimedList) msg += '\n\n点击头像领取任务！';
-  alert(msg);
+
+  demoQuests = demoQuests.filter(x => x.id !== id);
+  saveData();
+  closeModal('modal-quest-actions');
+  renderQuests2(currentQuestFilter);
 }
 
-function filterQuests(type) {
-  document.querySelectorAll('#page-home .filter-tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-  renderQuests(type);
-}
-function filterQuests2(type) {
-  document.querySelectorAll('#page-quests .filter-tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-  renderQuests2(type);
+function editQuest(id) {
+  closeModal('modal-quest-actions');
+  openQuestModal(id);
 }
 
-function showChildDetail(child) {
-  alert(`查看 ${child === 'stone' ? '石头' : '多多'} 的详细账单（草稿版，功能待完善）`);
+function deleteQuest(id) {
+  if (!confirm('确定删除该任务吗？')) return;
+  demoQuests = demoQuests.filter(x => x.id !== id);
+  saveData();
+  closeModal('modal-quest-actions');
+  renderQuests2(currentQuestFilter);
 }
 
 // 点击弹窗外部关闭
 document.querySelectorAll('.modal-overlay').forEach(m => {
   m.addEventListener('click', e => {
-    if (e.target === m) m.classList.remove('active');
+    if (e.target !== m) return;
+    if (m.id === 'modal-quest') {
+      closeQuestModal();
+    } else {
+      m.classList.remove('active');
+    }
   });
 });
 
@@ -2051,12 +2228,18 @@ const stickerValues = { star: 1000, super: 50, big: 5, small: 2.5 };
 const pickerSizes = { star: pickerBaseSizes.star, super: pickerBaseSizes.super, big: pickerBaseSizes.big, small: pickerBaseSizes.small };
 
 function getStashAmount(mode) {
-  return currencyStashes[mode].reduce((sum, item) => sum + (stickerValues[item.type] || 0), 0);
+  return currencyStashes[mode].reduce((sum, item) => {
+    const type = typeof item === 'string' ? item : item.type;
+    return sum + (stickerValues[type] || 0);
+  }, 0);
 }
 
 function getStashCounts(stash) {
   const counts = { star: 0, super: 0, big: 0, small: 0 };
-  stash.forEach(item => { if (counts[item.type] !== undefined) counts[item.type]++; });
+  stash.forEach(item => {
+    const type = typeof item === 'string' ? item : item.type;
+    if (counts[type] !== undefined) counts[type]++;
+  });
   return counts;
 }
 
@@ -2084,8 +2267,9 @@ function renderStash(mode) {
     area.appendChild(createStashHint(mode));
   } else {
     stash.forEach((item, index) => {
+      const type = typeof item === 'string' ? item : item.type;
       const wrapper = document.createElement('span');
-      wrapper.innerHTML = getStickerHtml(item.type);
+      wrapper.innerHTML = getStickerHtml(type);
       const sticker = wrapper.firstChild;
       sticker.classList.add('stash-sticker');
       sticker.style.display = 'inline-flex';
@@ -2117,6 +2301,7 @@ function runConfirm(mode) {
   if (mode === 'income') confirmIncome();
   else if (mode === 'expense') confirmExpense();
   else if (mode === 'transfer') confirmTransfer();
+  else if (mode === 'quest') confirmQuestModal();
 }
 
 function handleStashClick(mode, event) {
@@ -2339,7 +2524,7 @@ function confirmIncome() {
       type: 'income',
       childId,
       amount,
-      note: customNote || '获得奖励'
+      note: customNote || '获得奖贴'
     });
     const merges = computeMerges(oldCounts, stashCounts);
     if (merges.length > 0) playMergeAnimation(childId, merges);
@@ -2368,7 +2553,7 @@ function confirmExpense() {
       type: 'expense',
       childId,
       amount,
-      note: customNote || '消费支出'
+      note: customNote || '扣减奖贴'
     });
   });
 }
@@ -2450,7 +2635,7 @@ window.addEventListener('resize', () => {
   renderBalance('stone', getBalance('stone'));
   renderBalance('duoduo', getBalance('duoduo'));
   renderLedger();
-  if (document.getElementById('page-quests').classList.contains('active')) renderQuests2('all');
+  if (document.getElementById('page-quests').classList.contains('active')) renderQuests2(currentQuestFilter);
 });
 </script>
 
