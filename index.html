@@ -23,6 +23,10 @@
       --card-bg: #FFFFFF;
       --text-main: var(--dark-blue);
       --text-light: #6B9BCF;
+      --sticker-scale: 1;
+    }
+    @media (max-width: 768px) {
+      :root { --sticker-scale: 0.85; }
     }
 
     * {
@@ -614,10 +618,10 @@
       background: #FFF8DC;
     }
     /* 全局奖贴尺寸 - 统一使用这些类 */
-    .sticker-star { font-size: 168px; }
-    .sticker-super { width: 96px; height: 96px; }
-    .sticker-big { width: 64px; height: 64px; }
-    .sticker-small { width: 36px; height: 36px; }
+    .sticker-star { font-size: calc(168px * var(--sticker-scale)); }
+    .sticker-super { width: calc(96px * var(--sticker-scale)); height: calc(96px * var(--sticker-scale)); }
+    .sticker-big { width: calc(64px * var(--sticker-scale)); height: calc(64px * var(--sticker-scale)); }
+    .sticker-small { width: calc(36px * var(--sticker-scale)); height: calc(36px * var(--sticker-scale)); }
 
     /* 奖贴图片样式：按 PNG 原样显示 */
     .sticker-img {
@@ -625,10 +629,10 @@
     }
 
     .currency-option .emoji { display: block; margin: 0 auto 2px; transition: transform 0.15s; object-fit: contain; max-width: 100%; }
-    .currency-option .emoji.star-emoji { width: 168px; height: auto; }
-    .currency-option .emoji.super-emoji { width: 96px; height: auto; }
-    .currency-option .emoji.big-emoji { width: 64px; height: auto; }
-    .currency-option .emoji.small-emoji { width: 36px; height: auto; }
+    .currency-option .emoji.star-emoji { width: calc(168px * var(--sticker-scale)); height: auto; }
+    .currency-option .emoji.super-emoji { width: calc(96px * var(--sticker-scale)); height: auto; }
+    .currency-option .emoji.big-emoji { width: calc(64px * var(--sticker-scale)); height: auto; }
+    .currency-option .emoji.small-emoji { width: calc(36px * var(--sticker-scale)); height: auto; }
     .currency-option:active .emoji { transform: scale(0.85); }
 
     /* 头像选择器 */
@@ -1027,7 +1031,7 @@
 
 <!-- ========== 底部导航 ========== -->
 <div class="bottom-nav">
-  <button class="nav-item active" onclick="switchPage('home')">
+  <button class="nav-item active" data-page="home" onclick="switchPage('home')">
     <span class="icon">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M20 7H4C2.89543 7 2 7.89543 2 9V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V9C22 7.89543 21.1046 7 20 7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
@@ -1037,7 +1041,7 @@
     </span>
     <span>钱包</span>
   </button>
-  <button class="nav-item" onclick="switchPage('quests')">
+  <button class="nav-item" data-page="quests" onclick="switchPage('quests')">
     <span class="icon">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
@@ -1047,7 +1051,7 @@
     </span>
     <span>任务</span>
   </button>
-  <button class="nav-item" onclick="switchPage('ledger')">
+  <button class="nav-item" data-page="ledger" onclick="switchPage('ledger')">
     <span class="icon">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M6 3H18C19.1046 3 20 3.89543 20 5V19C20 20.1046 19.1046 21 18 21H6C4.89543 21 4 20.1046 4 19V5C4 3.89543 4.89543 3 6 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
@@ -1059,7 +1063,7 @@
     </span>
     <span>记账</span>
   </button>
-  <button class="nav-item" onclick="switchPage('settings')">
+  <button class="nav-item" data-page="settings" onclick="switchPage('settings')">
     <span class="icon">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" fill="currentColor"/>
@@ -1089,16 +1093,16 @@
     </div>
     <div class="currency-picker-simple">
       <div class="currency-item" onclick="addToStash('income', 'star', event)">
-        <img src="xingqiu.png" alt="星球" style="width:84px;height:84px;">
+        <img src="xingqiu.png" alt="星球" style="width:calc(84px * var(--sticker-scale));height:calc(84px * var(--sticker-scale));">
       </div>
       <div class="currency-item" onclick="addToStash('income', 'super', event)">
-        <img src="chaodajiangtie.png" alt="超大贴" style="width:64px;height:64px;">
+        <img src="chaodajiangtie.png" alt="超大贴" style="width:calc(64px * var(--sticker-scale));height:calc(64px * var(--sticker-scale));">
       </div>
       <div class="currency-item" onclick="addToStash('income', 'big', event)">
-        <img src="dajiangtie.png" alt="大奖贴" style="width:48px;height:48px;">
+        <img src="dajiangtie.png" alt="大奖贴" style="width:calc(48px * var(--sticker-scale));height:calc(48px * var(--sticker-scale));">
       </div>
       <div class="currency-item" onclick="addToStash('income', 'small', event)">
-        <img src="xiaojiangtie.png" alt="小奖贴" style="width:36px;height:36px;">
+        <img src="xiaojiangtie.png" alt="小奖贴" style="width:calc(36px * var(--sticker-scale));height:calc(36px * var(--sticker-scale));">
       </div>
     </div>
   </div>
@@ -1123,16 +1127,16 @@
     </div>
     <div class="currency-picker-simple">
       <div class="currency-item" onclick="addToStash('expense', 'star', event)">
-        <img src="xingqiu.png" alt="星球" style="width:84px;height:84px;">
+        <img src="xingqiu.png" alt="星球" style="width:calc(84px * var(--sticker-scale));height:calc(84px * var(--sticker-scale));">
       </div>
       <div class="currency-item" onclick="addToStash('expense', 'super', event)">
-        <img src="chaodajiangtie.png" alt="超大贴" style="width:64px;height:64px;">
+        <img src="chaodajiangtie.png" alt="超大贴" style="width:calc(64px * var(--sticker-scale));height:calc(64px * var(--sticker-scale));">
       </div>
       <div class="currency-item" onclick="addToStash('expense', 'big', event)">
-        <img src="dajiangtie.png" alt="大奖贴" style="width:48px;height:48px;">
+        <img src="dajiangtie.png" alt="大奖贴" style="width:calc(48px * var(--sticker-scale));height:calc(48px * var(--sticker-scale));">
       </div>
       <div class="currency-item" onclick="addToStash('expense', 'small', event)">
-        <img src="xiaojiangtie.png" alt="小奖贴" style="width:36px;height:36px;">
+        <img src="xiaojiangtie.png" alt="小奖贴" style="width:calc(36px * var(--sticker-scale));height:calc(36px * var(--sticker-scale));">
       </div>
     </div>
   </div>
@@ -1162,16 +1166,16 @@
     </div>
     <div class="currency-picker-simple">
       <div class="currency-item" onclick="addToStash('transfer', 'star', event)">
-        <img src="xingqiu.png" alt="星球" style="width:84px;height:84px;">
+        <img src="xingqiu.png" alt="星球" style="width:calc(84px * var(--sticker-scale));height:calc(84px * var(--sticker-scale));">
       </div>
       <div class="currency-item" onclick="addToStash('transfer', 'super', event)">
-        <img src="chaodajiangtie.png" alt="超大贴" style="width:64px;height:64px;">
+        <img src="chaodajiangtie.png" alt="超大贴" style="width:calc(64px * var(--sticker-scale));height:calc(64px * var(--sticker-scale));">
       </div>
       <div class="currency-item" onclick="addToStash('transfer', 'big', event)">
-        <img src="dajiangtie.png" alt="大奖贴" style="width:48px;height:48px;">
+        <img src="dajiangtie.png" alt="大奖贴" style="width:calc(48px * var(--sticker-scale));height:calc(48px * var(--sticker-scale));">
       </div>
       <div class="currency-item" onclick="addToStash('transfer', 'small', event)">
-        <img src="xiaojiangtie.png" alt="小奖贴" style="width:36px;height:36px;">
+        <img src="xiaojiangtie.png" alt="小奖贴" style="width:calc(36px * var(--sticker-scale));height:calc(36px * var(--sticker-scale));">
       </div>
     </div>
   </div>
@@ -1200,19 +1204,19 @@
       <label class="form-label">奖励 / 目标金额</label>
       <div class="currency-picker">
         <div class="currency-option">
-          <img class="emoji" src="xingqiu.png" alt="星球" style="width:64px;height:64px;">
+          <img class="emoji" src="xingqiu.png" alt="星球" style="width:calc(64px * var(--sticker-scale));height:calc(64px * var(--sticker-scale));">
           <span class="name">星球</span>
         </div>
         <div class="currency-option">
-          <img class="emoji" src="chaodajiangtie.png" alt="超大贴" style="width:64px;height:64px;">
+          <img class="emoji" src="chaodajiangtie.png" alt="超大贴" style="width:calc(64px * var(--sticker-scale));height:calc(64px * var(--sticker-scale));">
           <span class="name">超大贴</span>
         </div>
         <div class="currency-option selected">
-          <img class="emoji" src="dajiangtie.png" alt="大奖贴" style="width:56px;height:56px;">
+          <img class="emoji" src="dajiangtie.png" alt="大奖贴" style="width:calc(56px * var(--sticker-scale));height:calc(56px * var(--sticker-scale));">
           <span class="name">大奖贴</span>
         </div>
         <div class="currency-option">
-          <img class="emoji" src="xiaojiangtie.png" alt="小奖贴" style="width:48px;height:48px;">
+          <img class="emoji" src="xiaojiangtie.png" alt="小奖贴" style="width:calc(48px * var(--sticker-scale));height:calc(48px * var(--sticker-scale));">
           <span class="name">小奖贴</span>
         </div>
       </div>
@@ -1320,10 +1324,81 @@ function switchPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  event.target.closest('.nav-item').classList.add('active');
+  const activeNav = document.querySelector(`.nav-item[data-page="${page}"]`);
+  if (activeNav) activeNav.classList.add('active');
   if (page === 'quests') renderQuests2('all');
   if (page === 'ledger') renderLedger();
 }
+
+// 触屏滑动切换页面
+(function initSwipeNavigation() {
+  const pages = ['home', 'quests', 'ledger', 'settings'];
+  const SWIPE_THRESHOLD = 50;
+  const SWIPE_MAX_VERTICAL = 80;
+  const SWIPE_MAX_TIME = 400;
+
+  let startX = 0;
+  let startY = 0;
+  let startTime = 0;
+  let tracking = false;
+
+  function isSwipeEnabledTarget(target) {
+    if (!target) return true;
+    if (target.closest('.bottom-nav')) return false;
+    if (target.closest('.modal-overlay.active, .modal-sheet')) return false;
+    if (target.closest('input, textarea, select, button, label')) return false;
+    if (target.closest('.currency-staging-area, .stash-area, .currency-picker')) return false;
+    return true;
+  }
+
+  document.addEventListener('touchstart', function(e) {
+    if (!isSwipeEnabledTarget(e.target)) return;
+    const touch = e.touches[0];
+    startX = touch.clientX;
+    startY = touch.clientY;
+    startTime = Date.now();
+    tracking = true;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function(e) {
+    if (!tracking) return;
+    const touch = e.touches[0];
+    const dy = Math.abs(touch.clientY - startY);
+    if (dy > SWIPE_MAX_VERTICAL) {
+      tracking = false;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', function(e) {
+    if (!tracking) return;
+    tracking = false;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - startX;
+    const dy = touch.clientY - startY;
+    const dt = Date.now() - startTime;
+
+    if (dt > SWIPE_MAX_TIME) return;
+    if (Math.abs(dx) < SWIPE_THRESHOLD) return;
+    if (Math.abs(dy) > SWIPE_MAX_VERTICAL) return;
+    if (Math.abs(dy) >= Math.abs(dx)) return;
+
+    const activePage = document.querySelector('.page.active');
+    if (!activePage) return;
+    const current = activePage.id.replace('page-', '');
+    const idx = pages.indexOf(current);
+    if (idx < 0) return;
+
+    if (dx < 0 && idx < pages.length - 1) {
+      switchPage(pages[idx + 1]);
+    } else if (dx > 0 && idx > 0) {
+      switchPage(pages[idx - 1]);
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchcancel', function() {
+    tracking = false;
+  });
+})();
 
 // ========== 弹窗 ==========
 function openModal(id) {
@@ -1463,13 +1538,28 @@ function convertToCurrency(amount) {
   return { stars, supers, bigs, smalls };
 }
 
+// 奖贴基础尺寸（桌面端），移动端会根据 --sticker-scale 自动缩放
+const stickerBaseSizes = { star: 168, super: 96, big: 64, small: 36 };
+const pickerBaseSizes = { star: 84, super: 64, big: 48, small: 36 };
+
 // 奖贴配置：全部使用图片图标
 const stickerConfig = {
-  star: { emoji: null, img: 'xingqiu.png', size: 168, bg: 'star-bg', name: '星球' },
-  super: { emoji: null, img: 'chaodajiangtie.png', size: 96, bg: 'super-bg', name: '超大贴' },
-  big: { emoji: null, img: 'dajiangtie.png', size: 64, bg: 'big-bg', name: '大奖贴' },
-  small: { emoji: null, img: 'xiaojiangtie.png', size: 36, bg: 'small-bg', name: '小奖贴' }
+  star: { emoji: null, img: 'xingqiu.png', size: stickerBaseSizes.star, bg: 'star-bg', name: '星球' },
+  super: { emoji: null, img: 'chaodajiangtie.png', size: stickerBaseSizes.super, bg: 'super-bg', name: '超大贴' },
+  big: { emoji: null, img: 'dajiangtie.png', size: stickerBaseSizes.big, bg: 'big-bg', name: '大奖贴' },
+  small: { emoji: null, img: 'xiaojiangtie.png', size: stickerBaseSizes.small, bg: 'small-bg', name: '小奖贴' }
 };
+
+// 根据 CSS 变量 --sticker-scale 调整所有奖贴尺寸
+function applyStickerScale() {
+  const scale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sticker-scale')) || 1;
+  for (const type of Object.keys(stickerBaseSizes)) {
+    stickerConfig[type].size = Math.round(stickerBaseSizes[type] * scale);
+  }
+  for (const type of Object.keys(pickerBaseSizes)) {
+    pickerSizes[type] = Math.round(pickerBaseSizes[type] * scale);
+  }
+}
 
 // 生成单个奖贴 HTML
 function getStickerHtml(type, sizeOverride) {
@@ -1774,7 +1864,7 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
 
 // ========== 统一奖贴操作核心 ==========
 const stickerValues = { star: 1000, super: 50, big: 5, small: 2.5 };
-const pickerSizes = { star: 84, super: 64, big: 48, small: 36 };
+const pickerSizes = { star: pickerBaseSizes.star, super: pickerBaseSizes.super, big: pickerBaseSizes.big, small: pickerBaseSizes.small };
 
 function getStashAmount(mode) {
   return currencyStashes[mode].reduce((sum, item) => sum + (stickerValues[item.type] || 0), 0);
@@ -2165,10 +2255,19 @@ function initFloatingStickers() {
 }
 
 // ========== 初始化 ==========
+applyStickerScale();
 initFloatingStickers();
 renderBalance('stone', getBalance('stone'));
 renderBalance('duoduo', getBalance('duoduo'));
 renderLedger();
+
+window.addEventListener('resize', () => {
+  applyStickerScale();
+  renderBalance('stone', getBalance('stone'));
+  renderBalance('duoduo', getBalance('duoduo'));
+  renderLedger();
+  if (document.getElementById('page-quests').classList.contains('active')) renderQuests2('all');
+});
 </script>
 
 </body>
