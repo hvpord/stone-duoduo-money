@@ -27,16 +27,17 @@
     }
     @media (max-width: 768px) {
       :root { --sticker-scale: 0.85; }
-      .child-header { gap: 8px; }
+      .child-header { gap: 6px; }
       .child-avatar {
-        width: 90px;
-        height: 90px;
+        width: 72px;
+        height: 72px;
       }
-      .child-name { font-size: 22px; }
-      .child-total { font-size: 24px; }
+      .child-name { font-size: 20px; }
+      .child-total { font-size: 20px; }
+      .child-actions { gap: 4px; }
       .action-icon {
-        width: 44px;
-        height: 44px;
+        width: 36px;
+        height: 36px;
       }
     }
 
@@ -206,6 +207,7 @@
       flex-direction: column;
       gap: 2px;
       padding-top: 0;
+      min-width: 0;
     }
     .child-name {
       font-size: 24px;
