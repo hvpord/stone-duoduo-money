@@ -661,21 +661,18 @@
       border: 2px solid var(--star-color);
     }
 
-    /* 暂存区 */
+    /* 暂存区 - 扁平化，无边框 */
     .currency-staging-area {
       flex: 1;
-      min-height: 160px;
-      max-height: 220px;
-      background: #FFFDF5;
-      border: 2px dashed #FFD93D;
-      border-radius: 20px;
-      padding: 16px;
+      min-height: 140px;
+      max-height: 200px;
+      padding: 12px 8px;
       display: flex;
       flex-wrap: wrap;
       align-items: flex-end;
       justify-content: center;
       gap: 4px;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
       position: relative;
       overflow-y: auto;
     }
@@ -699,53 +696,43 @@
     .currency-staging-area .stash-sticker:active {
       transform: scale(0.85);
     }
+    .stash-action {
+      font-size: 40px;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.15s;
+      margin-left: 10px;
+      align-self: center;
+      -webkit-tap-highlight-color: transparent;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.12));
+      animation: stashPopIn 0.35s ease;
+    }
+    .stash-action:active {
+      transform: scale(0.82);
+    }
+    .stash-action.confirm {
+      color: #4CAF50;
+    }
+    .stash-action.cancel {
+      color: #E74C3C;
+      margin-left: 6px;
+    }
 
     /* 合计金额 */
     .staging-total {
       text-align: center;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 10px;
+      color: var(--text-light);
+      margin-bottom: 8px;
     }
 
-    /* 确认按钮 */
-    .confirm-btn {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: none;
-      background: linear-gradient(135deg, #4CAF50, #45A049);
-      color: white;
-      font-size: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 14px;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.35);
-      transition: transform 0.15s, box-shadow 0.15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .confirm-btn:active {
-      transform: scale(0.92);
-      box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
-    }
-    .confirm-btn.expense-confirm {
-      background: linear-gradient(135deg, #E74C3C, #C0392B);
-      box-shadow: 0 4px 15px rgba(231, 76, 60, 0.35);
-    }
-    .confirm-btn.expense-confirm:active {
-      box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
-    }
-
-    /* 底部奖贴选择器 - 无背景框 */
+    /* 底部奖贴选择器 - 无背景框，无横线 */
     .currency-picker-simple {
       display: flex;
       justify-content: space-around;
       align-items: flex-end;
-      padding: 10px 0 4px;
-      border-top: 1px solid #F0F0F5;
+      padding: 8px 0 4px;
     }
     .currency-item {
       padding: 6px;
@@ -763,22 +750,18 @@
       object-fit: contain;
     }
 
-    /* 转账方向迷你栏 */
+    /* 转账方向迷你栏 - 扁平化 */
     .transfer-mini {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 14px;
       margin-bottom: 12px;
-      padding: 10px;
-      background: #F8F8FC;
-      border-radius: 16px;
       cursor: pointer;
-      transition: background 0.2s;
       -webkit-tap-highlight-color: transparent;
     }
     .transfer-mini:active {
-      background: #E8E8F5;
+      opacity: 0.7;
     }
     .transfer-mini img {
       width: 44px;
@@ -965,7 +948,6 @@
       <span class="staging-hint" id="income-stash-hint">点击下面奖贴添加...</span>
     </div>
     <div class="staging-total" id="income-total">合计：¥0</div>
-    <button class="confirm-btn" onclick="confirmIncome()">✓</button>
     <div class="currency-picker-simple">
       <div class="currency-item" onclick="addToStash('income', 'star', event)">
         <img src="xingqiu.png" alt="星球" style="width:84px;height:84px;">
@@ -994,7 +976,6 @@
       <span class="staging-hint" id="expense-stash-hint">点击下面奖贴添加...</span>
     </div>
     <div class="staging-total" id="expense-total">合计：¥0</div>
-    <button class="confirm-btn expense-confirm" onclick="confirmExpense()">✓</button>
     <div class="currency-picker-simple">
       <div class="currency-item" onclick="addToStash('expense', 'star', event)">
         <img src="xingqiu.png" alt="星球" style="width:84px;height:84px;">
@@ -1028,7 +1009,6 @@
       <span class="staging-hint" id="transfer-stash-hint">点击下面奖贴添加...</span>
     </div>
     <div class="staging-total" id="transfer-total">合计：¥0</div>
-    <button class="confirm-btn" onclick="confirmTransfer()">✓</button>
     <div class="currency-picker-simple">
       <div class="currency-item" onclick="addToStash('transfer', 'star', event)">
         <img src="xingqiu.png" alt="星球" style="width:84px;height:84px;">
@@ -1644,8 +1624,28 @@ function renderStash(mode) {
       sticker.dataset.index = index;
       area.appendChild(sticker);
     });
+
+    const confirmBtn = document.createElement('span');
+    confirmBtn.className = 'stash-action confirm';
+    confirmBtn.textContent = '✓';
+    confirmBtn.title = '确认';
+    confirmBtn.onclick = (e) => { e.stopPropagation(); runConfirm(mode); };
+    area.appendChild(confirmBtn);
+
+    const cancelBtn = document.createElement('span');
+    cancelBtn.className = 'stash-action cancel';
+    cancelBtn.textContent = '✕';
+    cancelBtn.title = '清空';
+    cancelBtn.onclick = (e) => { e.stopPropagation(); currencyStashes[mode] = []; renderStash(mode); };
+    area.appendChild(cancelBtn);
   }
   if (totalEl) totalEl.textContent = '合计：' + formatAmount(getStashAmount(mode));
+}
+
+function runConfirm(mode) {
+  if (mode === 'income') confirmIncome();
+  else if (mode === 'expense') confirmExpense();
+  else if (mode === 'transfer') confirmTransfer();
 }
 
 function handleStashClick(mode, event) {
