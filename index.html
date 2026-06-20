@@ -1614,11 +1614,15 @@ async function pushLocalData() {
 
 function mergeRemoteData(remote) {
   if (!remote || typeof remote !== 'object') return { changed: false, message: '远程数据为空' };
-  if (!remote.data || typeof remote.data !== 'object') return { changed: false, message: '远程数据格式不正确' };
-  const remoteTime = Number(remote.lastModified) || 0;
+  // 兼容两种格式：直接存储的 appData，或包装后的 { lastModified, data: appData }
+  const remoteData = remote.data && typeof remote.data === 'object' ? remote.data : remote;
+  if (!remoteData.children || !Array.isArray(remoteData.quests) || !Array.isArray(remoteData.transactions)) {
+    return { changed: false, message: '远程数据格式不正确' };
+  }
+  const remoteTime = Number(remote.lastModified) || Number(remoteData.lastModified) || 0;
   const localTime = Number(appData.lastModified) || 0;
   if (remoteTime > localTime) {
-    appData = remote.data;
+    appData = remoteData;
     if (typeof appData.lastModified !== 'number') appData.lastModified = remoteTime;
     demoQuests = appData.quests || [];
     saveData();
