@@ -760,6 +760,10 @@
       transform: scale(0.98);
       box-shadow: 0 4px 15px rgba(91, 164, 230, 0.4);
     }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
     .currency-picker {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -1197,13 +1201,13 @@
     <div class="subtitle">管理你的小助手</div>
   </div>
   <div class="quest-list">
-    <div class="quest-card" onclick="openModal('modal-sync')">
+    <div class="quest-card" onclick="openSyncModal()">
       <div class="quest-icon task" style="font-size:18px;">☁️</div>
       <div class="quest-info">
         <div class="quest-title">云端同步</div>
         <div class="quest-meta">多设备共享数据</div>
       </div>
-      <div class="quest-status status-pending">未配置</div>
+      <div class="quest-status status-pending" id="sync-row-status">未配置</div>
     </div>
     <div class="quest-card">
       <div class="quest-icon wish" style="font-size:18px;">📤</div>
@@ -1439,6 +1443,30 @@
   </div>
 </div>
 
+<!-- ========== 弹窗：云端同步设置 ========== -->
+<div class="modal-overlay" id="modal-sync-setup">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div class="modal-title">☁️ 云端同步</div>
+      <button class="modal-close" onclick="closeModal('modal-sync-setup')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">GitHub Token</label>
+      <input class="form-input" type="password" id="sync-token-input" placeholder="粘贴 Personal Access Token（仅 gist 权限）">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Gist ID</label>
+      <input class="form-input" type="text" id="sync-gist-id" readonly>
+    </div>
+    <div class="form-group">
+      <label class="form-label">同步状态</label>
+      <div id="sync-status-text" style="font-size:14px;color:var(--text-light);line-height:1.6;">未配置</div>
+    </div>
+    <button class="btn-primary" onclick="handleSyncNow()" id="sync-now-btn">立即同步</button>
+    <button class="btn-primary" style="background:linear-gradient(135deg,#E57373,#EF5350);margin-top:10px;" onclick="clearSyncTokenFromModal()">清除 Token</button>
+  </div>
+</div>
+
 <script>
 // ========== 示例数据 ==========
 // assignee: 'stone' | 'duoduo' | 'both' - 谁的任务
@@ -1461,6 +1489,14 @@ const unitNames = {
 
 // ========== 数据持久化（localStorage）==========
 const STORAGE_KEY = 'stoneDuoduoMoney';
+
+// ========== 云端同步（GitHub Gist）==========
+const GIST_ID = ''; // 填入你的 Secret Gist ID
+const GIST_FILENAME = 'stone-duoduo-data.json';
+const SYNC_TOKEN_KEY = 'stoneDuoduoSyncToken';
+const LAST_AUTO_SYNC_KEY = 'stoneDuoduoLastAutoSync';
+const LAST_SYNC_TIME_KEY = 'stoneDuoduoLastSyncTime';
+const SYNC_STATUS_KEY = 'stoneDuoduoSyncStatus'; // success | error | ''
 
 function loadData() {
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -1492,12 +1528,16 @@ function loadData() {
           return migrated;
         });
       }
+      if (typeof data.lastModified !== 'number') {
+        data.lastModified = Date.now();
+      }
       return data;
     } catch (e) {
       console.warn('读取本地数据失败，使用默认数据');
     }
   }
   return {
+    lastModified: Date.now(),
     children: {
       stone: { name: '石头', balance: 1505 },
       duoduo: { name: '多多', balance: 257.5 }
@@ -1508,7 +1548,133 @@ function loadData() {
 }
 
 function saveData() {
+  appData.lastModified = Date.now();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+}
+
+function getSyncToken() {
+  return localStorage.getItem(SYNC_TOKEN_KEY) || '';
+}
+
+function setSyncToken(token) {
+  if (token) {
+    localStorage.setItem(SYNC_TOKEN_KEY, token.trim());
+  } else {
+    localStorage.removeItem(SYNC_TOKEN_KEY);
+  }
+  updateSyncRowStatus();
+}
+
+function getGistHeaders() {
+  const token = getSyncToken();
+  return token ? { Authorization: `token ${token}` } : {};
+}
+
+function formatSyncTime(timestamp) {
+  if (!timestamp) return '从未';
+  const d = new Date(Number(timestamp));
+  return `${d.getMonth() + 1}月${d.getDate()}日 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
+async function fetchRemoteData() {
+  const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+    headers: getGistHeaders()
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`读取 Gist 失败 (${res.status}): ${err}`);
+  }
+  const gist = await res.json();
+  const file = gist.files[GIST_FILENAME];
+  if (!file) throw new Error('Gist 中找不到数据文件');
+  return JSON.parse(file.content || '{}');
+}
+
+async function pushLocalData() {
+  const token = getSyncToken();
+  if (!token) throw new Error('未配置同步 Token');
+  const payload = JSON.stringify(appData, null, 2);
+  const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+    method: 'PATCH',
+    headers: {
+      ...getGistHeaders(),
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      files: {
+        [GIST_FILENAME]: { content: payload }
+      }
+    })
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`上传失败 (${res.status}): ${err}`);
+  }
+}
+
+function mergeRemoteData(remote) {
+  if (!remote || typeof remote !== 'object') return { changed: false, message: '远程数据为空' };
+  if (!remote.data || typeof remote.data !== 'object') return { changed: false, message: '远程数据格式不正确' };
+  const remoteTime = Number(remote.lastModified) || 0;
+  const localTime = Number(appData.lastModified) || 0;
+  if (remoteTime > localTime) {
+    appData = remote.data;
+    if (typeof appData.lastModified !== 'number') appData.lastModified = remoteTime;
+    demoQuests = appData.quests || [];
+    saveData();
+    renderAll();
+    return { changed: true, message: '已使用云端数据' };
+  }
+  return { changed: false, message: '本地数据已是最新' };
+}
+
+async function pullData() {
+  if (!GIST_ID) return { changed: false, message: '未配置 Gist ID' };
+  const remote = await fetchRemoteData();
+  const result = mergeRemoteData(remote);
+  localStorage.setItem(LAST_SYNC_TIME_KEY, String(Date.now()));
+  localStorage.setItem(SYNC_STATUS_KEY, 'success');
+  updateSyncRowStatus();
+  return result;
+}
+
+async function syncNow() {
+  if (!GIST_ID) throw new Error('未配置 Gist ID');
+  const pullResult = await pullData();
+  const token = getSyncToken();
+  if (token) {
+    await pushLocalData();
+    localStorage.setItem(LAST_SYNC_TIME_KEY, String(Date.now()));
+    localStorage.setItem(SYNC_STATUS_KEY, 'success');
+    updateSyncRowStatus();
+    return { ...pullResult, pushed: true };
+  }
+  updateSyncRowStatus();
+  return { ...pullResult, pushed: false };
+}
+
+function updateSyncRowStatus() {
+  const statusEl = document.getElementById('sync-row-status');
+  if (!statusEl) return;
+  const token = getSyncToken();
+  if (!token) {
+    statusEl.textContent = '未配置';
+    statusEl.className = 'quest-status status-pending';
+    return;
+  }
+  const lastSync = localStorage.getItem(LAST_SYNC_TIME_KEY);
+  const syncStatus = localStorage.getItem(SYNC_STATUS_KEY);
+  statusEl.textContent = lastSync ? formatSyncTime(lastSync) : '已配置';
+  statusEl.className = `quest-status ${syncStatus === 'error' ? 'status-pending' : 'status-completed'}`;
+}
+
+function renderAll() {
+  renderBalance('stone', getBalance('stone'));
+  renderBalance('duoduo', getBalance('duoduo'));
+  renderLedger();
+  if (document.getElementById('page-quests').classList.contains('active')) {
+    renderQuests2(currentQuestFilter);
+  }
 }
 
 function addTransaction(tx) {
@@ -1999,6 +2165,85 @@ function confirmQuestModal() {
   saveData();
   closeQuestModal();
   renderQuests2(renderFilter);
+}
+
+// ========== 云端同步弹窗 ==========
+function openSyncModal() {
+  const tokenInput = document.getElementById('sync-token-input');
+  const gistInput = document.getElementById('sync-gist-id');
+  const statusText = document.getElementById('sync-status-text');
+  const token = getSyncToken();
+  if (tokenInput) tokenInput.value = token ? '••••••••' : '';
+  if (gistInput) gistInput.value = GIST_ID || '未配置';
+  updateSyncModalStatus(statusText);
+  openModal('modal-sync-setup');
+}
+
+function updateSyncModalStatus(statusTextEl) {
+  if (!statusTextEl) statusTextEl = document.getElementById('sync-status-text');
+  if (!statusTextEl) return;
+  const token = getSyncToken();
+  if (!token) {
+    statusTextEl.textContent = '未配置 Token，只能使用本地数据。';
+    return;
+  }
+  if (!GIST_ID) {
+    statusTextEl.textContent = '未配置 Gist ID，无法同步。';
+    return;
+  }
+  const lastSync = localStorage.getItem(LAST_SYNC_TIME_KEY);
+  const syncStatus = localStorage.getItem(SYNC_STATUS_KEY);
+  const timeStr = lastSync ? formatSyncTime(lastSync) : '从未';
+  statusTextEl.textContent = `已配置｜最后同步：${timeStr}${syncStatus === 'error' ? '｜上次失败' : ''}`;
+}
+
+function saveSyncTokenFromModal() {
+  const input = document.getElementById('sync-token-input');
+  const token = input ? input.value.trim() : '';
+  if (!token || token === '••••••••') return;
+  setSyncToken(token);
+  updateSyncModalStatus();
+  updateSyncRowStatus();
+}
+
+function clearSyncTokenFromModal() {
+  if (!confirm('确定要清除同步 Token 吗？\n清除后本设备将不再上传数据。')) return;
+  setSyncToken('');
+  const input = document.getElementById('sync-token-input');
+  if (input) input.value = '';
+  updateSyncModalStatus();
+  updateSyncRowStatus();
+}
+
+async function handleSyncNow() {
+  const statusText = document.getElementById('sync-status-text');
+  const btn = document.getElementById('sync-now-btn');
+  if (!GIST_ID) {
+    if (statusText) statusText.textContent = '未配置 Gist ID，无法同步。';
+    return;
+  }
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '同步中…';
+  }
+  try {
+    saveSyncTokenFromModal();
+    const result = await syncNow();
+    const timeStr = formatSyncTime(Date.now());
+    if (statusText) {
+      statusText.textContent = `同步成功｜${timeStr}｜${result.message}${result.pushed ? '｜已上传' : '｜仅下载'}`;
+    }
+  } catch (err) {
+    console.error('同步失败', err);
+    localStorage.setItem(SYNC_STATUS_KEY, 'error');
+    if (statusText) statusText.textContent = `同步失败：${err.message || '请检查 Token 和网络'}`;
+  } finally {
+    updateSyncRowStatus();
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '立即同步';
+    }
+  }
 }
 
 // ========== 奖贴换算 ==========
@@ -2626,9 +2871,24 @@ function initFloatingStickers() {
 // ========== 初始化 ==========
 applyStickerScale();
 initFloatingStickers();
+updateSyncRowStatus();
 renderBalance('stone', getBalance('stone'));
 renderBalance('duoduo', getBalance('duoduo'));
 renderLedger();
+
+// 每天最多自动从云端拉取一次
+(async function initDailyPull() {
+  if (!GIST_ID || !navigator.onLine) return;
+  const today = new Date().toDateString();
+  const lastAutoSync = localStorage.getItem(LAST_AUTO_SYNC_KEY);
+  if (lastAutoSync === today) return;
+  try {
+    await pullData();
+    localStorage.setItem(LAST_AUTO_SYNC_KEY, today);
+  } catch (err) {
+    console.warn('每日自动同步失败', err);
+  }
+})();
 
 window.addEventListener('resize', () => {
   applyStickerScale();
