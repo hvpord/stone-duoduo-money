@@ -1507,6 +1507,13 @@ const SYNC_TOKEN_KEY = 'stoneDuoduoSyncToken';
 const LAST_AUTO_SYNC_KEY = 'stoneDuoduoLastAutoSync';
 const LAST_SYNC_TIME_KEY = 'stoneDuoduoLastSyncTime';
 const SYNC_STATUS_KEY = 'stoneDuoduoSyncStatus'; // success | error | ''
+const SYNC_INITIALIZED_KEY = 'stoneDuoduoSyncInitialized';
+const PRE_SYNC_BACKUP_KEY = 'stoneDuoduoPreSyncBackup';
+
+// 兼容已经长期使用 Token 的旧设备；新设备在本次页面打开后输入 Token 时不会被标记。
+if (localStorage.getItem(SYNC_TOKEN_KEY) && !localStorage.getItem(SYNC_INITIALIZED_KEY)) {
+  localStorage.setItem(SYNC_INITIALIZED_KEY, 'true');
+}
 
 function loadData() {
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -1547,7 +1554,8 @@ function loadData() {
     }
   }
   return {
-    lastModified: Date.now(),
+    // 新设备的默认演示数据不能比云端数据“更新”。
+    lastModified: 0,
     children: {
       stone: { name: '石头', balance: 1505 },
       duoduo: { name: '多多', balance: 257.5 }
@@ -1557,8 +1565,8 @@ function loadData() {
   };
 }
 
-function saveData() {
-  appData.lastModified = Date.now();
+function saveData(touchLastModified = true) {
+  if (touchLastModified) appData.lastModified = Date.now();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
 }
 
@@ -1568,11 +1576,32 @@ function getSyncToken() {
 
 function setSyncToken(token) {
   if (token) {
-    localStorage.setItem(SYNC_TOKEN_KEY, token.trim());
+    const normalizedToken = token.trim();
+    const oldToken = localStorage.getItem(SYNC_TOKEN_KEY) || '';
+    localStorage.setItem(SYNC_TOKEN_KEY, normalizedToken);
+    if (!oldToken || oldToken !== normalizedToken) {
+      localStorage.removeItem(SYNC_INITIALIZED_KEY);
+    }
   } else {
     localStorage.removeItem(SYNC_TOKEN_KEY);
+    localStorage.removeItem(SYNC_INITIALIZED_KEY);
   }
   updateSyncRowStatus();
+}
+
+function isSyncInitialized() {
+  return localStorage.getItem(SYNC_INITIALIZED_KEY) === 'true';
+}
+
+function backupLocalDataBeforeCloudReplace() {
+  try {
+    localStorage.setItem(PRE_SYNC_BACKUP_KEY, JSON.stringify({
+      backupAt: new Date().toISOString(),
+      data: appData
+    }));
+  } catch (err) {
+    throw new Error('无法备份本地数据，已停止下载覆盖');
+  }
 }
 
 function getGistHeaders() {
@@ -1622,30 +1651,33 @@ async function pushLocalData() {
   }
 }
 
-function mergeRemoteData(remote) {
-  if (!remote || typeof remote !== 'object') return { changed: false, message: '远程数据为空' };
+function mergeRemoteData(remote, forceCloud = false) {
+  if (!remote || typeof remote !== 'object') return { valid: false, changed: false, message: '远程数据为空' };
   // 兼容两种格式：直接存储的 appData，或包装后的 { lastModified, data: appData }
   const remoteData = remote.data && typeof remote.data === 'object' ? remote.data : remote;
   if (!remoteData.children || !Array.isArray(remoteData.quests) || !Array.isArray(remoteData.transactions)) {
-    return { changed: false, message: '远程数据格式不正确' };
+    return { valid: false, changed: false, message: '远程数据格式不正确' };
   }
   const remoteTime = Number(remote.lastModified) || Number(remoteData.lastModified) || 0;
   const localTime = Number(appData.lastModified) || 0;
-  if (remoteTime > localTime) {
+  if (forceCloud || remoteTime > localTime) {
+    if (forceCloud) backupLocalDataBeforeCloudReplace();
     appData = remoteData;
     if (typeof appData.lastModified !== 'number') appData.lastModified = remoteTime;
     demoQuests = appData.quests || [];
-    saveData();
+    // 下载云端数据时保留云端原始时间戳，避免本机被错误判定为更新。
+    saveData(false);
     renderAll();
-    return { changed: true, message: '已使用云端数据' };
+    return { valid: true, changed: true, message: forceCloud ? '已下载并使用云端数据' : '已使用云端数据' };
   }
-  return { changed: false, message: '本地数据已是最新' };
+  return { valid: true, changed: false, message: '本地数据已是最新' };
 }
 
-async function pullData() {
+async function pullData(forceCloud = false) {
   if (!GIST_ID) return { changed: false, message: '未配置 Gist ID' };
   const remote = await fetchRemoteData();
-  const result = mergeRemoteData(remote);
+  const result = mergeRemoteData(remote, forceCloud);
+  if (!result.valid) throw new Error(result.message);
   localStorage.setItem(LAST_SYNC_TIME_KEY, String(Date.now()));
   localStorage.setItem(SYNC_STATUS_KEY, 'success');
   updateSyncRowStatus();
@@ -1654,17 +1686,30 @@ async function pullData() {
 
 async function syncNow() {
   if (!GIST_ID) throw new Error('未配置 Gist ID');
-  const pullResult = await pullData();
   const token = getSyncToken();
-  if (token) {
-    await pushLocalData();
-    localStorage.setItem(LAST_SYNC_TIME_KEY, String(Date.now()));
-    localStorage.setItem(SYNC_STATUS_KEY, 'success');
+  const firstTokenSync = !!token && !isSyncInitialized();
+
+  // 无 Token 的设备只读使用云端；新设备首次输入 Token 时也只下载，绝不上传。
+  if (!token || firstTokenSync) {
+    const pullResult = await pullData(true);
+    if (firstTokenSync) {
+      localStorage.setItem(SYNC_INITIALIZED_KEY, 'true');
+    }
     updateSyncRowStatus();
-    return { ...pullResult, pushed: true };
+    return {
+      ...pullResult,
+      pushed: false,
+      firstTokenSync,
+      readOnly: !token
+    };
   }
+
+  const pullResult = await pullData();
+  await pushLocalData();
+  localStorage.setItem(LAST_SYNC_TIME_KEY, String(Date.now()));
+  localStorage.setItem(SYNC_STATUS_KEY, 'success');
   updateSyncRowStatus();
-  return { ...pullResult, pushed: false };
+  return { ...pullResult, pushed: true, firstTokenSync: false, readOnly: false };
 }
 
 function updateSyncRowStatus() {
@@ -2198,7 +2243,7 @@ function updateSyncModalStatus(statusTextEl) {
   if (!statusTextEl) return;
   const token = getSyncToken();
   if (!token) {
-    statusTextEl.textContent = '未配置 Token，只能使用本地数据。';
+    statusTextEl.textContent = '未配置 Token，可以下载云端数据，但不能上传。';
     return;
   }
   if (!GIST_ID) {
@@ -2245,7 +2290,13 @@ async function handleSyncNow() {
     const result = await syncNow();
     const timeStr = formatSyncTime(Date.now());
     if (statusText) {
-      statusText.textContent = `同步成功｜${timeStr}｜${result.message}${result.pushed ? '｜已上传' : '｜仅下载'}`;
+      if (result.firstTokenSync) {
+        statusText.textContent = `首次同步成功｜${timeStr}｜已安全下载云端数据｜本次未上传`;
+      } else if (result.readOnly) {
+        statusText.textContent = `同步成功｜${timeStr}｜${result.message}｜只读下载`;
+      } else {
+        statusText.textContent = `同步成功｜${timeStr}｜${result.message}｜已上传`;
+      }
     }
   } catch (err) {
     console.error('同步失败', err);
