@@ -490,6 +490,16 @@
       display: flex;
       gap: 8px;
     }
+    .ledger-reason {
+      margin-top: 5px;
+      color: var(--text-main);
+      font-size: 13px;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+    .ledger-reason-label {
+      color: var(--text-light);
+    }
     .quest-reward {
       font-size: 13px;
       font-weight: 700;
@@ -2346,6 +2356,19 @@ function renderLedgerCard(tx) {
   const date = new Date(tx.date);
   const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   const childName = tx.childId === 'stone' ? '石头' : '多多';
+  const actionLabels = {
+    income: '获得奖贴',
+    expense: '扣减奖贴'
+  };
+  const actionLabel = actionLabels[tx.type];
+  // 兼容旧记录：此前自定义原因保存在 note 中，没有独立的 reason 字段。
+  const reason = tx.reason || (
+    actionLabel && tx.note && tx.note !== actionLabel ? tx.note : ''
+  );
+  const title = actionLabel || tx.note || '奖贴记录';
+  const reasonHtml = reason
+    ? `<div class="ledger-reason"><span class="ledger-reason-label">原因：</span>${escapeHtml(reason)}</div>`
+    : '';
 
   let amountHtml = formatCurrency(tx.amount);
   let avatarHtml = renderLedgerAvatars(tx);
@@ -2360,12 +2383,22 @@ function renderLedgerCard(tx) {
     <div class="quest-card">
       <div class="quest-avatars-static ${tx.type === 'transfer' ? 'both' : ''}">${avatarHtml}</div>
       <div class="quest-info">
-        <div class="quest-title">${tx.note}</div>
+        <div class="quest-title">${escapeHtml(title)}</div>
+        ${reasonHtml}
         <div class="quest-meta">${dateStr} · ${childName}</div>
         <div class="quest-reward-row ledger-reward-row">${amountHtml}</div>
       </div>
     </div>
   `;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
 
 function renderLedgerAvatars(tx) {
@@ -2759,6 +2792,7 @@ function confirmIncome() {
   if (stash.length === 0) return;
   const childId = currencyContexts.income.childId;
   const amount = getStashAmount('income');
+  const customNote = currencyContexts.income.note;
   const oldCounts = getStickerCounts(getBalance(childId));
   const stashCounts = getStashCounts(stash);
 
@@ -2768,12 +2802,12 @@ function confirmIncome() {
   closeCurrencyModal('income');
   playFlyToWallet(childId, stash.map(s => s.type), sourceRects, () => {
     adjustBalance(childId, amount);
-    const customNote = currencyContexts.income.note;
     addTransaction({
       type: 'income',
       childId,
       amount,
-      note: customNote || '获得奖贴'
+      note: '获得奖贴',
+      reason: customNote
     });
     const merges = computeMerges(oldCounts, stashCounts);
     if (merges.length > 0) playMergeAnimation(childId, merges);
@@ -2786,6 +2820,7 @@ function confirmExpense() {
   if (stash.length === 0) return;
   const childId = currencyContexts.expense.childId;
   const amount = getStashAmount('expense');
+  const customNote = currencyContexts.expense.note;
   if (amount > getBalance(childId)) {
     alert('奖贴不够哦，请少扣一点～');
     return;
@@ -2797,12 +2832,12 @@ function confirmExpense() {
   closeCurrencyModal('expense');
   playFlyToWallet(childId, stash.map(s => s.type), sourceRects, () => {
     adjustBalance(childId, -amount);
-    const customNote = currencyContexts.expense.note;
     addTransaction({
       type: 'expense',
       childId,
       amount,
-      note: customNote || '扣减奖贴'
+      note: '扣减奖贴',
+      reason: customNote
     });
   });
 }
@@ -2814,6 +2849,7 @@ function confirmTransfer() {
   const from = currencyContexts.transfer.from;
   const to = currencyContexts.transfer.to;
   const amount = getStashAmount('transfer');
+  const customNote = currencyContexts.transfer.note;
   if (amount > getBalance(from)) {
     alert('奖贴不够哦，请少转一点～');
     return;
@@ -2828,7 +2864,6 @@ function confirmTransfer() {
   playFlyToWallet(to, stash.map(s => s.type), sourceRects, () => {
     adjustBalance(from, -amount);
     adjustBalance(to, amount);
-    const customNote = currencyContexts.transfer.note;
     const toName = to === 'stone' ? '石头' : '多多';
     addTransaction({
       type: 'transfer',
