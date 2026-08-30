@@ -429,6 +429,28 @@
       text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
     }
     .new-task-btn:active { transform: translateY(-50%) scale(0.9); }
+    .task-board-tools { display:flex; align-items:center; gap:10px; margin-left:auto; }
+    .task-icon-btn { width:38px; height:38px; border:none; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:22px; font-weight:800; box-shadow:0 3px 10px rgba(0,0,0,0.12); }
+    .task-icon-btn.add { background:#4CAF50; color:#fff; }
+    .task-icon-btn.archive { background:rgba(255,255,255,0.92); color:var(--dark-blue); }
+    .task-card-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .task-card-action { width:34px; height:34px; border-radius:12px; border:none; display:inline-flex; align-items:center; justify-content:center; font-size:17px; cursor:pointer; background:rgba(255,255,255,0.7); }
+    .task-card-action.complete { color:#2E7D32; background:#E8F8E8; }
+    .task-card-action.edit { color:#386A9D; background:#E8F4FD; }
+    .task-card-action.delete { color:#C62828; background:#FDECEC; }
+    .quest-badges { display:flex; flex-wrap:wrap; gap:5px; margin-top:5px; }
+    .quest-badge { font-size:11px; padding:3px 8px; border-radius:10px; color:var(--text-light); background:rgba(255,255,255,0.65); }
+    .quest-badge.expired { color:#C62828; background:#FDECEC; }
+    .form-check-row { display:flex; align-items:center; gap:10px; min-height:42px; font-size:14px; font-weight:600; }
+    .form-check-row input { width:20px; height:20px; accent-color:#4CAF50; }
+    .quest-modal-actions { display:flex; gap:10px; margin-top:16px; }
+    .quest-modal-actions button { flex:1; border:none; border-radius:14px; padding:12px; font-size:15px; font-weight:700; cursor:pointer; }
+    .modal-cancel-btn { background:#EEE; color:var(--text-main); }
+    .modal-confirm-btn { background:#4CAF50; color:#fff; }
+    .modal-danger-btn { background:#E74C3C; color:#fff; }
+    .archive-empty { text-align:center; color:var(--text-light); padding:36px 12px; }
+    .archive-card { cursor:default; align-items:flex-start; }
+    .archive-card .task-card-actions { flex-direction:column; }
 
     .quest-list {
       padding: 0 16px;
@@ -499,6 +521,16 @@
     }
     .ledger-reason-label {
       color: var(--text-light);
+    }
+    .quest-card.ledger-task-card,
+    #page-quests .quest-card {
+      background: linear-gradient(135deg, rgba(220, 245, 225, 0.96) 0%, rgba(238, 250, 215, 0.92) 100%);
+      border-color: rgba(112, 177, 105, 0.35);
+      box-shadow: 0 4px 14px rgba(67, 135, 76, 0.12);
+    }
+    .ledger-task-card .quest-title,
+    #page-quests .quest-card .quest-title {
+      color: #2E6B3A;
     }
     .quest-reward {
       font-size: 13px;
@@ -1176,7 +1208,7 @@
     <h1>🎯 任务中心</h1>
     <div class="subtitle">完成任务，赚取奖励贴！</div>
   </div>
-  <div class="filter-tabs" style="position:relative;">
+  <div class="filter-tabs" style="position:relative;align-items:center;">
     <button class="filter-tab active" data-filter="all" onclick="filterQuests2('all')">全部</button>
     <button class="filter-tab-avatar" data-filter="stone" onclick="filterQuests2('stone')">
       <img src="shitou.png" alt="石头的">
@@ -1188,7 +1220,10 @@
       <img src="shitou.png" alt="石头">
       <img src="duoduo.png" alt="多多">
     </button>
-    <button class="new-task-btn" onclick="openQuestModal()">新建任务</button>
+    <div class="task-board-tools">
+      <button class="task-icon-btn archive" onclick="openQuestArchive()" aria-label="已归档任务" title="已归档任务">🗂️</button>
+      <button class="task-icon-btn add" onclick="openQuestModal()" aria-label="新建任务" title="新建任务">+</button>
+    </div>
   </div>
   <div class="quest-list" id="quest-list2"></div>
 </div>
@@ -1224,13 +1259,6 @@
       <div class="quest-info">
         <div class="quest-title">导出数据</div>
         <div class="quest-meta">备份到文件</div>
-      </div>
-    </div>
-    <div class="quest-card" onclick="resetData()">
-      <div class="quest-icon challenge" style="font-size:18px;">🔄</div>
-      <div class="quest-info">
-        <div class="quest-title">重置数据</div>
-        <div class="quest-meta">清空所有记录</div>
       </div>
     </div>
   </div>
@@ -1413,6 +1441,14 @@
       <input class="form-input" id="quest-title-input" placeholder="比如：整理房间、帮妈妈拿快递">
     </div>
     <div class="form-group">
+      <label class="form-check-row"><input type="checkbox" id="quest-has-deadline" onchange="toggleQuestDeadline()"> 设置完成时限</label>
+      <input class="form-input" type="datetime-local" id="quest-deadline-input" style="display:none;">
+    </div>
+    <div class="form-group">
+      <label class="form-check-row"><input type="checkbox" id="quest-repeatable"> 可重复完成</label>
+      <div class="quest-meta">重复任务完成后会保留在任务板，每次都发放奖励。</div>
+    </div>
+    <div class="form-group">
       <label class="form-label">任务奖励</label>
       <div class="currency-staging-area" id="quest-stash-area" onclick="handleStashClick('quest', event)">
         <span class="staging-hint" id="quest-stash-hint">点击下面奖贴添加...</span>
@@ -1435,21 +1471,42 @@
         <img src="xiaojiangtie.png" alt="小奖贴" style="width:calc(36px * var(--sticker-scale));height:calc(36px * var(--sticker-scale));">
       </div>
     </div>
+    <div class="quest-modal-actions">
+      <button class="modal-cancel-btn" onclick="closeQuestModal()">取消</button>
+      <button class="modal-confirm-btn" onclick="confirmQuestModal()">发布任务</button>
+    </div>
   </div>
 </div>
 
-<!-- ========== 弹窗：任务操作 ========== -->
-<div class="modal-overlay" id="modal-quest-actions">
+<!-- ========== 弹窗：完成任务确认 ========== -->
+<div class="modal-overlay" id="modal-quest-complete">
   <div class="modal-sheet">
     <div class="modal-header">
-      <div class="modal-title">任务操作</div>
-      <button class="modal-close" onclick="closeModal('modal-quest-actions')">✕</button>
+      <div class="modal-title">✅ 确认完成任务</div>
+      <button class="modal-close" onclick="closeQuestCompleteModal()">✕</button>
     </div>
-    <div class="quest-actions">
-      <button class="quest-action-btn complete" onclick="completeQuest(currentActionQuestId)">完成</button>
-      <button class="quest-action-btn edit" onclick="editQuest(currentActionQuestId)">修改</button>
-      <button class="quest-action-btn delete" onclick="deleteQuest(currentActionQuestId)">删除</button>
+    <div class="form-group"><div class="quest-title" id="complete-quest-title"></div><div class="quest-meta" id="complete-quest-summary"></div></div>
+    <div class="form-group"><label class="form-label">额外备注（可选）</label><input class="form-input" id="complete-quest-note" placeholder="比如：今天洗得很认真"></div>
+    <div class="quest-modal-actions">
+      <button class="modal-cancel-btn" onclick="closeQuestCompleteModal()">取消</button>
+      <button class="modal-confirm-btn" onclick="confirmCompleteQuest()">确定并发放奖励</button>
     </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-quest-delete">
+  <div class="modal-sheet">
+    <div class="modal-header"><div class="modal-title">🗑️ 删除任务</div><button class="modal-close" onclick="closeModal('modal-quest-delete')">✕</button></div>
+    <div class="quest-title" id="delete-quest-title"></div>
+    <div class="quest-meta">删除后任务会进入“已归档任务”，仍可再次发起。</div>
+    <div class="quest-modal-actions"><button class="modal-cancel-btn" onclick="closeModal('modal-quest-delete')">取消</button><button class="modal-danger-btn" onclick="confirmDeleteQuest()">删除并归档</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-quest-archive">
+  <div class="modal-sheet">
+    <div class="modal-header"><div class="modal-title">🗂️ 已归档任务</div><button class="modal-close" onclick="closeModal('modal-quest-archive')">✕</button></div>
+    <div class="quest-list" id="quest-archive-list"></div>
   </div>
 </div>
 
@@ -1521,6 +1578,7 @@ function loadData() {
     try {
       const data = JSON.parse(saved);
       if (!data.transactions) data.transactions = [];
+      if (!Array.isArray(data.questArchive)) data.questArchive = [];
       if (data.quests) {
         data.quests = data.quests.map(q => {
           const migrated = {
@@ -1529,7 +1587,11 @@ function loadData() {
             assignee: q.assignee ?? 'stone',
             creator: q.creator ?? 'parent',
             claimedBy: Array.isArray(q.claimedBy) ? q.claimedBy : [],
-            completedBy: Array.isArray(q.completedBy) ? q.completedBy : []
+            completedBy: Array.isArray(q.completedBy) ? q.completedBy : [],
+            repeatable: Boolean(q.repeatable),
+            deadline: q.deadline || null,
+            createdAt: q.createdAt || null,
+            completionCount: Number(q.completionCount) || 0
           };
           // 旧数据使用 rewardUnit，需要换算成元和奖贴数组
           if (!q.rewardStash && q.rewardUnit) {
@@ -1561,6 +1623,7 @@ function loadData() {
       duoduo: { name: '多多', balance: 257.5 }
     },
     quests: JSON.parse(JSON.stringify(demoQuests)),
+    questArchive: [],
     transactions: []
   };
 }
@@ -1762,12 +1825,6 @@ function setBalance(childId, amount) {
 function adjustBalance(childId, delta) {
   const newBalance = Math.round((getBalance(childId) + delta) * 10) / 10;
   setBalance(childId, newBalance);
-}
-
-function resetData() {
-  if (!confirm('确定要清空所有数据吗？\n这会重置余额、任务领取和完成状态。')) return;
-  localStorage.removeItem(STORAGE_KEY);
-  location.reload();
 }
 
 // ========== 页面切换 ==========
@@ -2109,6 +2166,8 @@ function openTransferFrom(childId, event) {
 // ========== 任务弹窗 ==========
 let editingQuestId = null;
 let currentActionQuestId = null;
+let currentDeleteQuestId = null;
+let relaunchingArchiveId = null;
 
 function amountToStash(amount) {
   let remaining = Math.round(amount * 10) / 10;
@@ -2130,10 +2189,30 @@ function closeQuestModal() {
   currencyContexts.quest.note = '';
   currencyContexts.quest.assignees = [];
   editingQuestId = null;
+  relaunchingArchiveId = null;
   document.getElementById('quest-title-input').value = '';
   document.getElementById('quest-assign-stone').classList.remove('selected');
   document.getElementById('quest-assign-duoduo').classList.remove('selected');
+  document.getElementById('quest-has-deadline').checked = false;
+  document.getElementById('quest-deadline-input').value = '';
+  document.getElementById('quest-deadline-input').style.display = 'none';
+  document.getElementById('quest-repeatable').checked = false;
   renderStash('quest');
+}
+
+function toLocalDateTimeInput(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return offsetDate.toISOString().slice(0, 16);
+}
+
+function toggleQuestDeadline() {
+  const checked = document.getElementById('quest-has-deadline').checked;
+  const input = document.getElementById('quest-deadline-input');
+  input.style.display = checked ? 'block' : 'none';
+  if (!checked) input.value = '';
 }
 
 function openQuestModal(id) {
@@ -2143,6 +2222,10 @@ function openQuestModal(id) {
   document.getElementById('quest-title-input').value = '';
   document.getElementById('quest-assign-stone').classList.remove('selected');
   document.getElementById('quest-assign-duoduo').classList.remove('selected');
+  document.getElementById('quest-has-deadline').checked = false;
+  document.getElementById('quest-deadline-input').value = '';
+  document.getElementById('quest-deadline-input').style.display = 'none';
+  document.getElementById('quest-repeatable').checked = false;
 
   if (id) {
     const q = demoQuests.find(x => x.id === id);
@@ -2157,6 +2240,12 @@ function openQuestModal(id) {
       } else {
         currencyContexts.quest.assignees = [q.assignee];
         document.getElementById('quest-assign-' + q.assignee).classList.add('selected');
+      }
+      document.getElementById('quest-repeatable').checked = Boolean(q.repeatable);
+      if (q.deadline) {
+        document.getElementById('quest-has-deadline').checked = true;
+        document.getElementById('quest-deadline-input').value = toLocalDateTimeInput(q.deadline);
+        document.getElementById('quest-deadline-input').style.display = 'block';
       }
     }
   } else {
@@ -2197,6 +2286,14 @@ function confirmQuestModal() {
 
   const assignee = assignees.length === 2 ? 'both' : assignees[0];
   const rewardStash = currencyStashes.quest.map(item => typeof item === 'string' ? item : item.type);
+  const repeatable = document.getElementById('quest-repeatable').checked;
+  const hasDeadline = document.getElementById('quest-has-deadline').checked;
+  const deadlineValue = document.getElementById('quest-deadline-input').value;
+  if (hasDeadline && !deadlineValue) {
+    alert('请选择任务截止时间～');
+    return;
+  }
+  const deadline = hasDeadline ? new Date(deadlineValue).toISOString() : null;
 
   if (editingQuestId) {
     const q = demoQuests.find(x => x.id === editingQuestId);
@@ -2205,6 +2302,8 @@ function confirmQuestModal() {
       q.assignee = assignee;
       q.reward = reward;
       q.rewardStash = rewardStash;
+      q.repeatable = repeatable;
+      q.deadline = deadline;
     }
   } else {
     demoQuests.unshift({
@@ -2216,10 +2315,15 @@ function confirmQuestModal() {
       assignee,
       creator: 'parent',
       claimedBy: [],
-      completedBy: []
+      completedBy: [],
+      repeatable,
+      deadline,
+      createdAt: new Date().toISOString(),
+      completionCount: 0
     });
   }
 
+  appData.quests = demoQuests;
   const renderFilter = editingQuestId ? currentQuestFilter : 'all';
   saveData();
   closeQuestModal();
@@ -2389,8 +2493,10 @@ function renderQuests2(filter) {
   const list = document.getElementById('quest-list2');
   const filtered = filter === 'all'
     ? demoQuests
-    : demoQuests.filter(q => q.assignee === filter);
-  list.innerHTML = filtered.map(q => renderQuestCard(q)).join('');
+    : demoQuests.filter(q => q.assignee === filter || q.assignee === 'both');
+  list.innerHTML = filtered.length
+    ? filtered.map(q => renderQuestCard(q)).join('')
+    : '<div class="archive-empty">还没有待完成的任务～</div>';
 }
 
 function renderLedger() {
@@ -2411,7 +2517,7 @@ function renderLedgerCard(tx) {
     income: '获得奖贴',
     expense: '扣减奖贴'
   };
-  const actionLabel = actionLabels[tx.type];
+  const actionLabel = tx.questId ? null : actionLabels[tx.type];
   // 兼容旧记录：此前自定义原因保存在 note 中，没有独立的 reason 字段。
   const reason = tx.reason || (
     actionLabel && tx.note && tx.note !== actionLabel ? tx.note : ''
@@ -2431,7 +2537,7 @@ function renderLedgerCard(tx) {
   }
 
   return `
-    <div class="quest-card">
+    <div class="quest-card ${tx.questId ? 'ledger-task-card' : ''}">
       <div class="quest-avatars-static ${tx.type === 'transfer' ? 'both' : ''}">${avatarHtml}</div>
       <div class="quest-info">
         <div class="quest-title">${escapeHtml(title)}</div>
@@ -2466,14 +2572,27 @@ function renderLedgerAvatars(tx) {
 }
 
 function renderQuestCard(q) {
+  const deadline = q.deadline ? new Date(q.deadline) : null;
+  const expired = deadline && deadline.getTime() < Date.now();
+  const deadlineText = deadline ? `${deadline.getMonth() + 1}月${deadline.getDate()}日 ${String(deadline.getHours()).padStart(2, '0')}:${String(deadline.getMinutes()).padStart(2, '0')}` : '';
   return `
-    <div class="quest-card" onclick="openQuestActions(${q.id})">
+    <div class="quest-card">
       <div class="quest-avatars-static ${q.assignee === 'both' ? 'both' : ''}">
         ${renderQuestAvatarsStatic(q)}
       </div>
       <div class="quest-info">
-        <div class="quest-title">${q.title}</div>
+        <div class="quest-title">${escapeHtml(q.title)}</div>
         <div class="quest-reward-row">${formatCurrency(q.reward)}</div>
+        <div class="quest-badges">
+          ${q.repeatable ? '<span class="quest-badge">🔁 可重复</span>' : '<span class="quest-badge">完成后归档</span>'}
+          ${deadline ? `<span class="quest-badge ${expired ? 'expired' : ''}">⏰ ${expired ? '已过期' : '截止'} ${deadlineText}</span>` : ''}
+          ${q.completionCount ? `<span class="quest-badge">已完成 ${q.completionCount} 次</span>` : ''}
+        </div>
+      </div>
+      <div class="task-card-actions">
+        <button class="task-card-action complete" onclick="openQuestComplete(${q.id}, event)" aria-label="完成任务" title="完成">✓</button>
+        <button class="task-card-action edit" onclick="editQuest(${q.id}, event)" aria-label="编辑任务" title="编辑">✎</button>
+        <button class="task-card-action delete" onclick="deleteQuest(${q.id}, event)" aria-label="删除任务" title="删除">🗑</button>
       </div>
     </div>
   `;
@@ -2504,44 +2623,161 @@ function filterQuests2(filter) {
   renderQuests2(filter);
 }
 
-// 任务操作：完成 / 修改 / 删除
-function openQuestActions(id) {
-  currentActionQuestId = id;
-  openModal('modal-quest-actions');
-}
-
-function completeQuest(id) {
+// 任务操作：完成 / 编辑 / 删除 / 归档
+function openQuestComplete(id, event) {
+  if (event) event.stopPropagation();
   const q = demoQuests.find(x => x.id === id);
   if (!q) return;
+  if (q.deadline && new Date(q.deadline).getTime() < Date.now()) {
+    alert('这个任务已经过了截止时间，请先编辑任务时限再完成～');
+    return;
+  }
+  currentActionQuestId = id;
+  document.getElementById('complete-quest-title').textContent = `完成任务：${q.title}`;
+  document.getElementById('complete-quest-summary').textContent = q.assignee === 'both'
+    ? `奖励将平均发给石头和多多，合计 ${formatAmount(q.reward)}`
+    : `奖励发给${q.assignee === 'stone' ? '石头' : '多多'}，合计 ${formatAmount(q.reward)}`;
+  document.getElementById('complete-quest-note').value = '';
+  openModal('modal-quest-complete');
+}
+
+function closeQuestCompleteModal() {
+  currentActionQuestId = null;
+  document.getElementById('complete-quest-note').value = '';
+  closeModal('modal-quest-complete');
+}
+
+function archiveQuest(q, status, note = '') {
+  if (!Array.isArray(appData.questArchive)) appData.questArchive = [];
+  appData.questArchive.unshift({
+    archiveId: Date.now() + Math.random().toString(36).slice(2),
+    sourceQuestId: q.id,
+    title: q.title,
+    reward: q.reward,
+    rewardStash: Array.isArray(q.rewardStash) ? [...q.rewardStash] : amountToStash(q.reward),
+    assignee: q.assignee,
+    repeatable: Boolean(q.repeatable),
+    deadline: q.deadline || null,
+    status,
+    note,
+    archivedAt: new Date().toISOString()
+  });
+}
+
+function confirmCompleteQuest() {
+  const q = demoQuests.find(x => x.id === currentActionQuestId);
+  if (!q) return closeQuestCompleteModal();
+  const extraNote = document.getElementById('complete-quest-note').value.trim();
+  const transactionNote = `完成任务：${q.title}。`;
 
   if (q.assignee === 'both') {
     const perChild = Math.round((q.reward / 2) * 10) / 10;
     adjustBalance('stone', perChild);
     adjustBalance('duoduo', perChild);
-    addTransaction({ type: 'income', childId: 'stone', amount: perChild, note: `完成「${q.title}」获得奖励` });
-    addTransaction({ type: 'income', childId: 'duoduo', amount: perChild, note: `完成「${q.title}」获得奖励` });
+    addTransaction({ type:'income', childId:'stone', amount:perChild, note:transactionNote, reason:extraNote, questId:q.id });
+    addTransaction({ type:'income', childId:'duoduo', amount:perChild, note:transactionNote, reason:extraNote, questId:q.id });
   } else {
     adjustBalance(q.assignee, q.reward);
-    addTransaction({ type: 'income', childId: q.assignee, amount: q.reward, note: `完成「${q.title}」获得奖励` });
+    addTransaction({ type:'income', childId:q.assignee, amount:q.reward, note:transactionNote, reason:extraNote, questId:q.id });
   }
 
-  demoQuests = demoQuests.filter(x => x.id !== id);
+  archiveQuest(q, 'completed', extraNote);
+  if (q.repeatable) {
+    q.completionCount = (Number(q.completionCount) || 0) + 1;
+    q.lastCompletedAt = new Date().toISOString();
+  } else {
+    demoQuests = demoQuests.filter(x => x.id !== q.id);
+  }
+  appData.quests = demoQuests;
   saveData();
-  closeModal('modal-quest-actions');
-  renderQuests2(currentQuestFilter);
+  closeQuestCompleteModal();
+  renderAll();
 }
 
-function editQuest(id) {
-  closeModal('modal-quest-actions');
+function editQuest(id, event) {
+  if (event) event.stopPropagation();
   openQuestModal(id);
 }
 
-function deleteQuest(id) {
-  if (!confirm('确定删除该任务吗？')) return;
-  demoQuests = demoQuests.filter(x => x.id !== id);
+function deleteQuest(id, event) {
+  if (event) event.stopPropagation();
+  const q = demoQuests.find(x => x.id === id);
+  if (!q) return;
+  currentDeleteQuestId = id;
+  document.getElementById('delete-quest-title').textContent = q.title;
+  openModal('modal-quest-delete');
+}
+
+function confirmDeleteQuest() {
+  const q = demoQuests.find(x => x.id === currentDeleteQuestId);
+  if (!q) return closeModal('modal-quest-delete');
+  archiveQuest(q, 'deleted');
+  demoQuests = demoQuests.filter(x => x.id !== q.id);
+  appData.quests = demoQuests;
   saveData();
-  closeModal('modal-quest-actions');
+  currentDeleteQuestId = null;
+  closeModal('modal-quest-delete');
   renderQuests2(currentQuestFilter);
+}
+
+function openQuestArchive() {
+  renderQuestArchive();
+  openModal('modal-quest-archive');
+}
+
+function renderQuestArchive() {
+  const list = document.getElementById('quest-archive-list');
+  const archive = appData.questArchive || [];
+  if (!archive.length) {
+    list.innerHTML = '<div class="archive-empty">还没有已归档任务～</div>';
+    return;
+  }
+  list.innerHTML = archive.map(item => {
+    const date = new Date(item.archivedAt);
+    const dateText = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+    const statusText = item.status === 'completed' ? '已完成' : '已删除';
+    return `<div class="quest-card archive-card">
+      <div class="quest-info">
+        <div class="quest-title">${escapeHtml(item.title)}</div>
+        <div class="quest-meta">${statusText} · ${dateText}</div>
+        ${item.note ? `<div class="ledger-reason"><span class="ledger-reason-label">备注：</span>${escapeHtml(item.note)}</div>` : ''}
+        <div class="quest-reward-row">${formatCurrency(item.reward)}</div>
+      </div>
+      <div class="task-card-actions">
+        <button class="task-card-action edit" onclick="relaunchArchivedQuest('${item.archiveId}')" title="再次发起">↻</button>
+        <button class="task-card-action delete" onclick="permanentlyDeleteArchivedQuest('${item.archiveId}')" title="永久删除">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function relaunchArchivedQuest(archiveId) {
+  const item = (appData.questArchive || []).find(x => x.archiveId === archiveId);
+  if (!item) return;
+  closeModal('modal-quest-archive');
+  openQuestModal();
+  relaunchingArchiveId = archiveId;
+  document.getElementById('quest-modal-title').textContent = '↻ 再次发起任务';
+  document.getElementById('quest-title-input').value = item.title;
+  currencyStashes.quest = Array.isArray(item.rewardStash) ? [...item.rewardStash] : amountToStash(item.reward);
+  const assignees = item.assignee === 'both' ? ['stone', 'duoduo'] : [item.assignee];
+  currencyContexts.quest.assignees = assignees;
+  assignees.forEach(id => document.getElementById('quest-assign-' + id).classList.add('selected'));
+  document.getElementById('quest-repeatable').checked = Boolean(item.repeatable);
+  if (item.deadline && new Date(item.deadline).getTime() > Date.now()) {
+    document.getElementById('quest-has-deadline').checked = true;
+    document.getElementById('quest-deadline-input').value = toLocalDateTimeInput(item.deadline);
+    document.getElementById('quest-deadline-input').style.display = 'block';
+  }
+  renderStash('quest');
+}
+
+function permanentlyDeleteArchivedQuest(archiveId) {
+  const item = (appData.questArchive || []).find(x => x.archiveId === archiveId);
+  if (!item || !confirm(`确定永久删除归档记录“${item.title}”吗？\n此操作不可恢复。`)) return;
+  appData.questArchive = appData.questArchive.filter(x => x.archiveId !== archiveId);
+  saveData();
+  renderQuestArchive();
 }
 
 // 点击弹窗外部关闭
